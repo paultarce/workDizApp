@@ -6,7 +6,7 @@
     android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity"
+
     tools:showIn="@layout/activity_main"
     >
 
@@ -15,12 +15,6 @@
         android:layout_width="match_parent"
         android:layout_height="58dp"
         android:background="?android:attr/listDivider" />
-
-    <Button
-        android:id="@+id/startScan"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Scan Detector" />
 
     <View
         android:id="@+id/divider"
@@ -39,6 +33,16 @@
         android:textSize="18sp"
          />
 
+    <Button
+        android:id="@+id/connectDevice"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginStart="8dp"
+        android:layout_marginLeft="129dp"
+        android:layout_marginTop="8dp"
+        android:layout_marginBottom="8dp"
+        android:text="Connect" />
+
     <View
         android:id="@+id/divider2"
         android:layout_width="match_parent"
@@ -54,17 +58,6 @@
         android:layout_marginTop="8dp"
         android:gravity="center"
         android:text="Device Address" />
-
-    <Button
-        android:id="@+id/connectDevice"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginBottom="8dp"
-        android:layout_marginLeft="129dp"
-        android:layout_marginStart="8dp"
-        android:layout_marginTop="8dp"
-        android:text="Connect"
-         />
 
     <TextView
         android:id="@+id/textView6"
@@ -146,11 +139,16 @@
         android:id="@+id/connectService"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginBottom="0dp"
         android:layout_marginLeft="5dp"
         android:layout_marginTop="8dp"
-        android:text="Connect Service"
-         />
+        android:layout_marginBottom="0dp"
+        android:text="Connect Service" />
+
+    <Button
+        android:id="@+id/startScan"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Scan Detector" />
 
 
 </LinearLayout>

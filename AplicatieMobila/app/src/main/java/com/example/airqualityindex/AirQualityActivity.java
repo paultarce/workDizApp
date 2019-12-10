@@ -52,9 +52,6 @@ public class AirQualityActivity extends AppCompatActivity {
     private static final String TAG = "MainActivity";
 
     @BindView(R.id.startScan)
-    Button buttonScan;
-
-    @BindView(R.id.startScan)
     Button button;
     @BindView(R.id.connectDevice)
     Button connectDevice;
@@ -211,11 +208,17 @@ public class AirQualityActivity extends AppCompatActivity {
         @Override
         public void onServiceConnected(ComponentName name, IBinder service) {
 
+            mBluetoothLEService = ((BluetoothLEService.LocalBinder) service).getService();
+            if (!mBluetoothLEService.initialize()) {
+                Log.e(TAG, "Unable to initialize Bluetooth");
+                finish();
+            }
+            mBluetoothLEService.connect(bluetoothDevice.getAddress());
         }
 
         @Override
         public void onServiceDisconnected(ComponentName name) {
-
+            mBluetoothLEService = null;
         }
     };
 
