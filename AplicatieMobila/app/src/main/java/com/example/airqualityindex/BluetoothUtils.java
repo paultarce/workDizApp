@@ -11,3 +11,9 @@ public class BluetoothUtils {
         return mBluetoothManager.getAdapter();
     }
 }
+
+
+// Bluetooth Estimote 1 : F1:09:A5:2A:A0:92
+// Estimote 2 : FC:F9:AC:E7:3D:8A
+
+

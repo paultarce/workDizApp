@@ -70,14 +70,30 @@ public class AirQualityActivity extends AppCompatActivity {
 
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
-    BluetoothDevice bluetoothDevice;
+
     private boolean mScanning;
+
+    //This class provides methods to perform scan related operations for Bluetooth LE devices. An application can scan for a particular type of Bluetooth LE devices using ScanFilter.
+    // It can also request different types of callbacks for delivering the result.
     private BluetoothLeScanner bluetoothLeScanner;
+
+    //Represents a remote Bluetooth device. A BluetoothDevice lets you create a connection with the respective device or query information about it,
+    // such as the name, address, class, and bonding state.
+    BluetoothDevice bluetoothDevice;
+
+
+    //Represents the local device Bluetooth adapter. The BluetoothAdapter lets you perform fundamental Bluetooth tasks, such
+    // as initiate device discovery, query a list of bonded (paired) devices, instantiate a BluetoothDevice using a known MAC
+    // address, and create a BluetoothServerSocket to listen for connection requests from other devices, and start a scan for Bluetooth LE devices.
+   //Fundamentally, this is your starting point for all Bluetooth actions. Once you have the local adapter, you can get a set of BluetoothDevice
+    // objects representing all paired devices with getBondedDevices(); start device discovery with startDiscovery()
     private BluetoothAdapter mBluetoothAdapter;
 
     @BindView(R.id.connectService)
     Button connectService;
 
+    //A GATT characteristic is a basic data element used to construct a GATT service, BluetoothGattService. The characteristic contains a value as
+    // well as additional information and optional GATT descriptors, BluetoothGattDescriptor.
     private BluetoothGattCharacteristic mNotifyCharacteristic;
     private boolean mConnected = false;
 
@@ -91,10 +107,10 @@ public class AirQualityActivity extends AppCompatActivity {
     // ACTION_DATA_AVAILABLE: received data from the device.  This can be a result of read
     //                        or notification operations.
     private final BroadcastReceiver mGattUpdateReceiver = new BroadcastReceiver() {
-        @Override
-        public void onReceive(Context context, Intent intent) {
-            final String action = intent.getAction();
-            if (BluetoothLEService.ACTION_GATT_CONNECTED.equals(action)) {
+                @Override
+                public void onReceive(Context context, Intent intent) {
+                    final String action = intent.getAction();
+                    if (BluetoothLEService.ACTION_GATT_CONNECTED.equals(action)) {
                 mConnected = true;
                 updateConnectionState("connected");
                 invalidateOptionsMenu();
@@ -228,6 +244,7 @@ public class AirQualityActivity extends AppCompatActivity {
             super.onScanResult(callbackType, result);
             bluetoothDevice = result.getDevice();
             deviceAddress.setText(bluetoothDevice.getAddress());
+            deviceName.setText(bluetoothDevice.getName());
             progressBar.setVisibility(View.INVISIBLE);
         }
 
@@ -240,6 +257,7 @@ public class AirQualityActivity extends AppCompatActivity {
         public void onScanFailed(int errorCode) {
             super.onScanFailed(errorCode);
             Log.d(TAG, "Scanning Failed " + errorCode);
+            Toast.makeText(getApplicationContext(), "Scanning Failed", Toast.LENGTH_SHORT).show();
             progressBar.setVisibility(View.INVISIBLE);
         }
     };
@@ -277,7 +295,10 @@ public class AirQualityActivity extends AppCompatActivity {
             }, Constants.SCAN_PERIOD);
 
             mScanning = true;
-            bluetoothLeScanner.startScan(scanFilters, settings, scanCallback);
+           // bluetoothLeScanner.startScan(scanFilters, settings, scanCallback);
+            bluetoothLeScanner.startScan(scanCallback);
+
+           // mBluetoothAdapter.startLeScan(SampleGattAttributes.UUID_AIRQUALITY_SERVICE, );
         }
 
         else
@@ -320,19 +341,23 @@ public class AirQualityActivity extends AppCompatActivity {
         if (serviceString != null) {
             List<BluetoothGattCharacteristic> gattCharacteristics =
                     gattService.getCharacteristics();
-
+            BluetoothGattCharacteristic gattCharacteristicFound = null;
             for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
                // HashMap<String, String> currentCharaData = new HashMap<String, String>();
                 uuid = gattCharacteristic.getUuid().toString();
                 charaString = SampleGattAttributes.lookup(uuid);
                 if (charaString != null) {
                     serviceName.setText(charaString);
+                    gattCharacteristicFound = gattCharacteristic;
+                    break;
                 }
-                mNotifyCharacteristic = gattCharacteristic;
-                return;
+
             }
+            mNotifyCharacteristic = gattCharacteristicFound;
+            return;
         }
     }
+
     }
 
 

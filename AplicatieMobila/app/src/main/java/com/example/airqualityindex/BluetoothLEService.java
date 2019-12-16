@@ -35,6 +35,7 @@ public class BluetoothLEService extends Service {
             "com.example.airqualityindex.le.EXTRA_DATA";
 
 
+
     public final static UUID UUID_AirQuality_LEVEL =
             UUID.fromString(SampleGattAttributes.UUID_AIRQUALITY_LEVEL_UUID);
     private static final String TAG = "BluetoothLEService";
@@ -157,13 +158,13 @@ public class BluetoothLEService extends Service {
         return mBluetoothGatt.getServices();
     }
 
-    private void broadcastUpdate(final String action)
+    private void broadcastUpdate(final String action) // trimit spre MainACtivity rezultatul
     {
         final Intent intent = new Intent(action);
         sendBroadcast(intent);
     }
 
-    private void broadcastUpdate(final String action, final BluetoothGattCharacteristic characteristic) {
+    private void broadcastUpdate(final String action, final BluetoothGattCharacteristic characteristic) { // trimit spre MainACtivity rezultatul
         final Intent intent = new Intent(action);
         if (UUID_AirQuality_LEVEL.equals(characteristic.getUuid())) {
             int format = BluetoothGattCharacteristic.FORMAT_UINT8;
