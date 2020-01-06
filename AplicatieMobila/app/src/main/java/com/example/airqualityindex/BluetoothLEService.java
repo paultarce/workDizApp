@@ -70,6 +70,7 @@ public class BluetoothLEService extends Service {
 
                 Log.i(TAG, "Attempting to start service discovery:" +
                         mBluetoothGatt.discoverServices());
+
             }
 
             else if(newState == BluetoothProfile.STATE_DISCONNECTED)
@@ -168,8 +169,9 @@ public class BluetoothLEService extends Service {
         final Intent intent = new Intent(action);
         if (UUID_AirQuality_LEVEL.equals(characteristic.getUuid())) {
             int format = BluetoothGattCharacteristic.FORMAT_UINT8;
+            int value = characteristic.getValue()[2];
             final int battery_level = characteristic.getIntValue(format, 0);
-            intent.putExtra(EXTRA_DATA, battery_level+"%");
+            intent.putExtra(EXTRA_DATA, value+"%");
         }
         sendBroadcast(intent);
     }
