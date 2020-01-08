@@ -38,6 +38,10 @@ public class BluetoothLEService extends Service {
 
     public final static UUID UUID_AirQuality_LEVEL =
             UUID.fromString(SampleGattAttributes.UUID_AIRQUALITY_LEVEL_UUID);
+
+    public final static UUID UUID_Battery_LEVEL =
+            UUID.fromString(SampleGattAttributes.UUID_BATTERY_LEVEL_UUID);
+
     private static final String TAG = "BluetoothLEService";
 
     private static final int STATE_DISCONNECT = 0;
@@ -170,8 +174,15 @@ public class BluetoothLEService extends Service {
         if (UUID_AirQuality_LEVEL.equals(characteristic.getUuid())) {
             int format = BluetoothGattCharacteristic.FORMAT_UINT8;
             int value = characteristic.getValue()[2];
+            //final int battery_level = characteristic.getIntValue(format, 0);
+            intent.putExtra(EXTRA_DATA, value);
+        }
+        if(UUID_Battery_LEVEL.equals(characteristic.getUuid()))
+        {
+            int format = BluetoothGattCharacteristic.FORMAT_UINT8;
+            //int value = characteristic.getValue()[2];
             final int battery_level = characteristic.getIntValue(format, 0);
-            intent.putExtra(EXTRA_DATA, value+"%");
+            intent.putExtra(EXTRA_DATA, battery_level+"%");
         }
         sendBroadcast(intent);
     }

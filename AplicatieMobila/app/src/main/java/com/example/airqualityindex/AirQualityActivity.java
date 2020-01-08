@@ -62,6 +62,9 @@ public class AirQualityActivity extends AppCompatActivity {
     @BindView(R.id.airQualityLevel)
     TextView airQualityLevel;
 
+    @BindView(R.id.batteryLevel)
+    TextView batteryLevelText;
+
     @BindView(R.id.deviceAddress)
     TextView deviceAddress;
     @BindView(R.id.deviceName)
@@ -95,7 +98,7 @@ public class AirQualityActivity extends AppCompatActivity {
 
     //A GATT characteristic is a basic data element used to construct a GATT service, BluetoothGattService. The characteristic contains a value as
     // well as additional information and optional GATT descriptors, BluetoothGattDescriptor.
-    private BluetoothGattCharacteristic mNotifyCharacteristic;
+    private List<BluetoothGattCharacteristic> mNotifyCharacteristics;
     private boolean mConnected = false;
 
     private BluetoothLEService mBluetoothLEService;
@@ -161,7 +164,7 @@ public class AirQualityActivity extends AppCompatActivity {
             }
         });
 
-        connectService.setOnClickListener(new View.OnClickListener() {
+       /* connectService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 if (mNotifyCharacteristic != null) {
@@ -174,7 +177,26 @@ public class AirQualityActivity extends AppCompatActivity {
                     }
                 }
             }
+        });*/
+        connectService.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+
+                for (BluetoothGattCharacteristic mNotifyCharacteristic: mNotifyCharacteristics) {
+
+                    if (mNotifyCharacteristic != null) {
+                        final int charaProp = mNotifyCharacteristic.getProperties();
+                        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
+                            mBluetoothLEService.readCharacteristic(mNotifyCharacteristic);
+                        }
+                        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+                            mBluetoothLEService.setCharacteristicNotification(mNotifyCharacteristic, true);
+                        }
+                    }
+                }
+            }
         });
+
     }
 
     @Override
@@ -322,7 +344,10 @@ public class AirQualityActivity extends AppCompatActivity {
 
     private void displayData(String data) {
         if (data != null) {
-            airQualityLevel.setText(data);
+            if(!data.contains("%"))
+                airQualityLevel.setText(data);
+            else
+                batteryLevelText.setText(data);
         }
     }
 
@@ -333,6 +358,8 @@ public class AirQualityActivity extends AppCompatActivity {
         String uuid = null;
         String serviceString = "unknown service";
         String charaString = "unknown characteristic";
+        mNotifyCharacteristics = new ArrayList<BluetoothGattCharacteristic>();
+        int charFound = 0;
 
         for (BluetoothGattService gattService : gattServices) {
 
@@ -344,19 +371,26 @@ public class AirQualityActivity extends AppCompatActivity {
                 List<BluetoothGattCharacteristic> gattCharacteristics =
                         gattService.getCharacteristics();
                 BluetoothGattCharacteristic gattCharacteristicFound = null;
+
                 for (BluetoothGattCharacteristic gattCharacteristic : gattCharacteristics) {
                     // HashMap<String, String> currentCharaData = new HashMap<String, String>();
                     uuid = gattCharacteristic.getUuid().toString();
                     charaString = SampleGattAttributes.lookup(uuid);
                     if (charaString != null) {
-                        serviceName.setText(charaString);
-                        gattCharacteristicFound = gattCharacteristic;
-                        break;
+                        if(charFound == 0)
+                            serviceName.setText(charaString);
+                        else
+                            serviceName.append("| " + charaString );
+                        //serviceName.append(charaString);
+                       // gattCharacteristicFound = gattCharacteristic;
+                        mNotifyCharacteristics.add(gattCharacteristic);
+                        charFound = 1;
+                        //break;
                     }
 
                 }
-                mNotifyCharacteristic = gattCharacteristicFound;
-                return;
+                //mNotifyCharacteristic = gattCharacteristicFound;
+               // return;
             }
         }
 
