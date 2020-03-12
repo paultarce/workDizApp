@@ -1,10 +1,23 @@
 <menu xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context="com.example.airqualityindex.MainActivity">
+    tools:context="com.example.airqualityindex.AirQualityActivity">
     <item
         android:id="@+id/action_settings"
         android:orderInCategory="100"
         android:title="@string/action_settings"
         app:showAsAction="never" />
+
+    <item
+        android:id="@+id/miCompose"
+        android:icon="@drawable/ic_bluetooth_searching_black_24dp"
+        app:showAsAction="ifRoom"
+        android:title="Compose">
+    </item>
+    <item
+        android:id="@+id/miProfile"
+        android:icon="@drawable/ic_keyboard_arrow_down_black_24dp"
+        app:showAsAction="ifRoom|withText"
+        android:title="Profile">
+    </item>
 </menu>

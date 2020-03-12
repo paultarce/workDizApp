@@ -7,20 +7,15 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     tools:showIn="@layout/activity_main"
+    android:id="@+id/expandableView"
+    android:visibility="gone"
     >
-
-    <View
-        android:id="@+id/divider3"
-        android:layout_width="match_parent"
-        android:layout_height="58dp"
-        android:background="?android:attr/listDivider" />
 
     <View
         android:id="@+id/divider"
         android:layout_width="match_parent"
-        android:layout_height="20dp"
+        android:layout_height="58dp"
         android:background="?android:attr/listDivider" />
-
 
     <LinearLayout
         android:orientation="horizontal"
@@ -65,8 +60,6 @@
         android:layout_marginTop="8dp"
         android:layout_marginBottom="8dp"
         android:text="Connect" />
-
-
 
     <TextView
         android:id="@+id/deviceAddress"

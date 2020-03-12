@@ -1,9 +1,17 @@
 package com.example.airqualityindex;
 
 import android.Manifest;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.PersistableBundle;
+import android.transition.AutoTransition;
+import android.transition.TransitionManager;
+import android.view.Menu;
+import android.view.MenuInflater;
 import android.view.View;
 import android.widget.Button;
+import android.widget.LinearLayout;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -34,15 +42,23 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import androidx.appcompat.widget.Toolbar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import pl.pawelkleczkowski.customgauge.CustomGauge;
 
 
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+
+//import com.github.aakira.expandablelayout.ExpandableLayout;
+
+import com.ekn.gruzer.gaugelibrary.HalfGauge;
+import com.ekn.gruzer.gaugelibrary.Range;
 
 import java.lang.Object;
 import java.util.ArrayList;
@@ -51,6 +67,7 @@ import java.util.List;
 public class AirQualityActivity extends AppCompatActivity {
 
     private static final String TAG = "MainActivity";
+
 
     @BindView(R.id.startScan)
     Button button;
@@ -74,6 +91,33 @@ public class AirQualityActivity extends AppCompatActivity {
 
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
+
+    /*@BindView(R.id.toolbar)
+    Toolbar toolbar;*/
+
+    @BindView(R.id.expandableView)
+    LinearLayout expandableView;
+
+    @BindView(R.id.arrowBtn)
+    Button arrowBtn;
+
+    @BindView(R.id.cardView)
+    CardView cardView;
+
+    @BindView(R.id.gauge1)
+    CustomGauge gauge1;
+
+    @BindView(R.id.textView1)
+    TextView textView1;
+
+    @BindView(R.id.halfGauge)
+    HalfGauge halfGauge;
+
+    /*@BindView(R.id.expandableLayout1)
+    ExpandableLayout expandabableLayout1;
+*/
+    /*@BindView(R.id.expandableButton1)
+    Button expandableButton1;*/
 
     private boolean mScanning;
 
@@ -123,18 +167,46 @@ public class AirQualityActivity extends AppCompatActivity {
                 mConnected = false;
                 updateConnectionState("disconnected");
                 unbindService(mServiceConnection);
-                //clearUI();
+                //clearUI(f);
             }
             else if (BluetoothLEService.ACTION_GATT_SERVICES_DISCOVERED.equals(action))
             {
                 displayGattServices(mBluetoothLEService.getSupportedGattServices());
             }
-            else if (BluetoothLEService.ACTION_DATA_AVAILABLE.equals(action))
+            else if (BluetoothLEService.ACTION_DATA_AVAILABLE.equals(action)) // primesc date de la sevciciul BluetoothLEService
             {
                 displayData(intent.getStringExtra(BluetoothLEService.EXTRA_DATA));
             }
         }
     };
+
+    public void setHalfGauge()
+    {
+        Range range = new Range();
+        range.setColor(Color.parseColor("#00b20b"));
+        range.setFrom(0);
+        range.setTo(50.0);
+
+        Range range2 = new Range();
+        range2.setColor(Color.parseColor("#E3E500"));
+        range2.setFrom(50);
+        range2.setTo(100);
+
+        Range range3 = new Range();
+        range3.setColor(Color.parseColor("#ce0000"));
+        range3.setFrom(100);
+        range3.setTo(150);
+
+        //add color ranges to gauge
+        halfGauge.addRange(range);
+        halfGauge.addRange(range2);
+        halfGauge.addRange(range3);
+
+        //set min max and current value
+        halfGauge.setMinValue(0.0);
+        halfGauge.setMaxValue(150.0);
+        halfGauge.setValue(35.0);
+    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -143,7 +215,41 @@ public class AirQualityActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        toolbar.setTitle("Air Quality Index");
+        setSupportActionBar(toolbar);
         mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter(AirQualityActivity.this);
+
+        //toolbar.setTitle("Air Quality Index");
+        int value = 80;
+        gauge1.setValue(value);
+        textView1.setText(value + "/800");
+
+        setHalfGauge();
+
+        arrowBtn.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                if(expandableView.getVisibility() == View.GONE) {
+                    TransitionManager.beginDelayedTransition(cardView, new AutoTransition());
+                    expandableView.setVisibility(View.VISIBLE);
+                    arrowBtn.setBackgroundResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
+                }
+                else
+                {
+                    TransitionManager.beginDelayedTransition(cardView, new AutoTransition());
+                    expandableView.setVisibility(View.GONE);
+                    arrowBtn.setBackgroundResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
+                }
+            }
+        });
+
+       /* expandableButton1.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+              //  expandabableLayout1.toggle();
+            }
+        });*/
 
         button.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -197,6 +303,14 @@ public class AirQualityActivity extends AppCompatActivity {
             }
         });
 
+    }
+
+    // Menu icons are inflated just as they were with actionbar
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        // Inflate the menu; this adds items to the action bar if it is present.
+        getMenuInflater().inflate(R.menu.menu_main, menu);
+        return true;
     }
 
     @Override
@@ -324,9 +438,7 @@ public class AirQualityActivity extends AppCompatActivity {
 
             mScanning = true;
             bluetoothLeScanner.startScan(scanFilters, settings, scanCallback);
-           // bluetoothLeScanner.startScan(scanCallback);
-
-            // mBluetoothAdapter.startLeScan(SampleGattAttributes.UUID_AIRQUALITY_SERVICE,);
+           // bluetoothLeScanner.startScan(scanCallback);// mBluetoothAdapter.startLeScan(SampleGattAttributes.UUID_AIRQUALITY_SERVICE,);
         } else {
             mScanning = false;
             bluetoothLeScanner.stopScan(scanCallback);
