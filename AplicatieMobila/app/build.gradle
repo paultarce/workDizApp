@@ -33,6 +33,11 @@ dependencies {
     implementation 'pl.pawelkleczkowski.customgauge:CustomGauge:1.0.4'
     implementation 'com.ekn.gruzer.gaugelibrary:gaugelibrary:0.2.0'
 
+    //implementation 'in.unicodelabs.sorbh:kdgaugeview:1.0.0'
+
+    implementation 'com.github.anastr:speedviewlib:1.5.2'
+    implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk7:1.3.50"
+
     implementation 'com.jakewharton:butterknife:9.0.0-rc2'
     annotationProcessor 'com.jakewharton:butterknife-compiler:9.0.0-rc2'
     //implementation 'com.github.aakira:expandable-layout:1.6.0@aar'

@@ -46,6 +46,7 @@ import androidx.appcompat.widget.Toolbar;
 
 import butterknife.BindView;
 import butterknife.ButterKnife;
+//import in.unicodelabs.kdgaugeview.KdGaugeView;
 import pl.pawelkleczkowski.customgauge.CustomGauge;
 
 
@@ -59,6 +60,8 @@ import androidx.core.content.ContextCompat;
 
 import com.ekn.gruzer.gaugelibrary.HalfGauge;
 import com.ekn.gruzer.gaugelibrary.Range;
+import com.github.anastr.speedviewlib.TubeSpeedometer;
+import com.github.anastr.speedviewlib.components.Section;
 
 import java.lang.Object;
 import java.util.ArrayList;
@@ -113,11 +116,17 @@ public class AirQualityActivity extends AppCompatActivity {
     @BindView(R.id.halfGauge)
     HalfGauge halfGauge;
 
+   // @BindView(R.id.speedMeter)
+    //KdGaugeView speedView;
+
     /*@BindView(R.id.expandableLayout1)
     ExpandableLayout expandabableLayout1;
 */
     /*@BindView(R.id.expandableButton1)
     Button expandableButton1;*/
+
+    @BindView(R.id.tubeSpeedometer)
+    TubeSpeedometer tubeSpeedometer;
 
     private boolean mScanning;
 
@@ -226,6 +235,23 @@ public class AirQualityActivity extends AppCompatActivity {
         textView1.setText(value + "/800");
 
         setHalfGauge();
+       // speedView.setSpeed(167);
+       // speedView.drawSpeedometer();
+
+        tubeSpeedometer.setMaxSpeed(500);
+        tubeSpeedometer.setTrembleData(0,0);
+
+        tubeSpeedometer.makeSections(5, Color.CYAN, Section.Style.ROUND);
+        List<Section> sections = tubeSpeedometer.getSections();
+        sections.get(0).setColor(Color.GREEN);
+        sections.get(1).setColor(Color.YELLOW);
+        sections.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
+        sections.get(3).setColor(Color.RED);
+        sections.get(4).setColor(Color.rgb(128,0,0));
+
+       // tubeSpeedometer.addSections(Section(0, 0.1 , Color.LTGRAY));
+
+        tubeSpeedometer.speedTo(450);
 
         arrowBtn.setOnClickListener(new View.OnClickListener() {
             @Override

@@ -228,11 +228,54 @@
 
         <com.ekn.gruzer.gaugelibrary.HalfGauge
             android:id="@+id/halfGauge"
-            android:layout_width="200dp"
-            android:layout_height="200dp"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
             android:layout_below="@+id/gauge1"
-            android:layout_centerHorizontal="true"
-            />
+            android:layout_centerHorizontal="true"/>
+
+       <!-- <in.unicodelabs.kdgaugeview.KdGaugeView
+            android:id="@+id/speedMeter"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:layout_below="@+id/halfGauge"
+            android:layout_marginLeft="10dp"
+            app:maxSpeed="180"
+            app:minSpeed="0"
+            app:speed="60"
+            app:speed_limit="90"
+            app:animationTime="2000"
+            app:speedTextSize="40dp"
+            app:unitOfMeasurementTextSize="15dp"
+            app:unitOfMeasurement="ppm"
+            app:speedLimitTextSize="5dp"
+            app:speedDialRingWidth="7dp"
+            app:speedDialRingInnerPadding="7dp"
+             />-->
+
+        <com.github.anastr.speedviewlib.TubeSpeedometer
+            android:id="@+id/tubeSpeedometer"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            android:layout_marginTop="5dp"
+            app:sv_speedometerWidth="10dp"
+            app:sv_speedTextPosition="BOTTOM_CENTER"
+            app:sv_unitUnderSpeedText="true"
+            app:sv_unit="ppm"
+            app:sv_speedTextFormat="INTEGER"
+            app:sv_unitTextSize="13dp"
+            app:sv_speedTextSize="32dp"
+            android:layout_below="@+id/halfGauge"/>
+
+       <!-- <com.github.anastr.speedviewlib.TubeSpeedometer
+            android:id="@+id/tubeSpeedometer"
+            android:layout_width="100dp"
+            android:layout_height="100dp"
+            android:layout_gravity="center"
+            android:layout_below="@+id/halfGauge"
+            />-->
 
     </RelativeLayout>
 
