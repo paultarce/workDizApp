@@ -107,14 +107,14 @@ public class AirQualityActivity extends AppCompatActivity {
     @BindView(R.id.cardView)
     CardView cardView;
 
-    @BindView(R.id.gauge1)
+   /* @BindView(R.id.gauge1)
     CustomGauge gauge1;
 
     @BindView(R.id.textView1)
-    TextView textView1;
+    TextView textView1;*/
 
-    @BindView(R.id.halfGauge)
-    HalfGauge halfGauge;
+  /*  @BindView(R.id.halfGauge)
+    HalfGauge halfGauge;*/
 
    // @BindView(R.id.speedMeter)
     //KdGaugeView speedView;
@@ -125,8 +125,26 @@ public class AirQualityActivity extends AppCompatActivity {
     /*@BindView(R.id.expandableButton1)
     Button expandableButton1;*/
 
-    @BindView(R.id.tubeSpeedometer)
-    TubeSpeedometer tubeSpeedometer;
+    @BindView(R.id.gauge_AQI)
+    TubeSpeedometer gauge_AQI;
+
+    @BindView(R.id.gauge_CO)
+    TubeSpeedometer gauge_CO;
+
+    @BindView(R.id.gauge_NO2)
+    TubeSpeedometer gauge_NO2;
+
+    @BindView(R.id.gauge_O3)
+    TubeSpeedometer gauge_O3;
+
+    @BindView(R.id.gauge_PM10)
+    TubeSpeedometer gauge_PM10;
+
+    @BindView(R.id.gauge_PM25)
+    TubeSpeedometer gauge_PM25;
+
+    @BindView(R.id.gauge_SO2)
+    TubeSpeedometer gauge_SO2;
 
     private boolean mScanning;
 
@@ -191,7 +209,7 @@ public class AirQualityActivity extends AppCompatActivity {
 
     public void setHalfGauge()
     {
-        Range range = new Range();
+       /* Range range = new Range();
         range.setColor(Color.parseColor("#00b20b"));
         range.setFrom(0);
         range.setTo(50.0);
@@ -214,7 +232,46 @@ public class AirQualityActivity extends AppCompatActivity {
         //set min max and current value
         halfGauge.setMinValue(0.0);
         halfGauge.setMaxValue(150.0);
-        halfGauge.setValue(35.0);
+        halfGauge.setValue(35.0);*/
+    }
+
+    public void InitializeGauges()
+    {
+
+        gauge_AQI.setMaxSpeed(500);
+        gauge_AQI.setTrembleData(0,0);
+        gauge_AQI.makeSections(5, Color.CYAN, Section.Style.ROUND);
+        List<Section> sections = gauge_AQI.getSections();
+        sections.get(0).setColor(Color.GREEN);
+        sections.get(1).setColor(Color.YELLOW);
+        sections.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
+        sections.get(3).setColor(Color.RED);
+        sections.get(4).setColor(Color.rgb(128,0,0));
+        gauge_AQI.speedTo(249);
+
+
+        gauge_NO2.setMaxSpeed(500);
+        gauge_NO2.setTrembleData(0,0);
+        gauge_NO2.makeSections(5, Color.CYAN, Section.Style.SQUARE);
+        List<Section> sections2 = gauge_NO2.getSections();
+        sections2.get(0).setColor(Color.GREEN);
+        sections2.get(1).setColor(Color.YELLOW);
+        sections2.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
+        sections2.get(3).setColor(Color.RED);
+        sections2.get(4).setColor(Color.rgb(128,0,0));
+        gauge_NO2.speedTo(450);
+
+        gauge_PM10.setMaxSpeed(200);
+        gauge_PM10.setTrembleData(0,0);
+        gauge_PM10.makeSections(5, Color.CYAN, Section.Style.ROUND);
+        List<Section> sections3 = gauge_PM10.getSections();
+        sections3.get(0).setColor(Color.GREEN);
+        sections3.get(1).setColor(Color.YELLOW);
+        sections3.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
+        sections3.get(3).setColor(Color.RED);
+        sections3.get(4).setColor(Color.rgb(128,0,0));
+        gauge_PM10.speedTo(10);
+
     }
 
     @Override
@@ -230,28 +287,14 @@ public class AirQualityActivity extends AppCompatActivity {
         mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter(AirQualityActivity.this);
 
         //toolbar.setTitle("Air Quality Index");
-        int value = 80;
+       /* int value = 80;
         gauge1.setValue(value);
-        textView1.setText(value + "/800");
+        textView1.setText(value + "/800");*/
 
         setHalfGauge();
        // speedView.setSpeed(167);
        // speedView.drawSpeedometer();
-
-        tubeSpeedometer.setMaxSpeed(500);
-        tubeSpeedometer.setTrembleData(0,0);
-
-        tubeSpeedometer.makeSections(5, Color.CYAN, Section.Style.ROUND);
-        List<Section> sections = tubeSpeedometer.getSections();
-        sections.get(0).setColor(Color.GREEN);
-        sections.get(1).setColor(Color.YELLOW);
-        sections.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
-        sections.get(3).setColor(Color.RED);
-        sections.get(4).setColor(Color.rgb(128,0,0));
-
-       // tubeSpeedometer.addSections(Section(0, 0.1 , Color.LTGRAY));
-
-        tubeSpeedometer.speedTo(450);
+        InitializeGauges();
 
         arrowBtn.setOnClickListener(new View.OnClickListener() {
             @Override
