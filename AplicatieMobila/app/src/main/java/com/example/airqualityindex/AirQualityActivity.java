@@ -281,9 +281,9 @@ public class AirQualityActivity extends AppCompatActivity {
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
+        /*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Air Quality Index");
-        setSupportActionBar(toolbar);
+        setSupportActionBar(toolbar);*/
         mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter(AirQualityActivity.this);
 
         //toolbar.setTitle("Air Quality Index");
