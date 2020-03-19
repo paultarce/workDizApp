@@ -1,6 +1,7 @@
 package com.example.airqualityindex;
 
 import android.Manifest;
+import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
@@ -10,6 +11,7 @@ import android.transition.TransitionManager;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
+import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
@@ -62,12 +64,13 @@ import com.ekn.gruzer.gaugelibrary.HalfGauge;
 import com.ekn.gruzer.gaugelibrary.Range;
 import com.github.anastr.speedviewlib.TubeSpeedometer;
 import com.github.anastr.speedviewlib.components.Section;
+import com.google.android.material.button.MaterialButton;
 
 import java.lang.Object;
 import java.util.ArrayList;
 import java.util.List;
 
-public class AirQualityActivity extends AppCompatActivity {
+public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActivity
 
     private static final String TAG = "MainActivity";
 
@@ -235,49 +238,14 @@ public class AirQualityActivity extends AppCompatActivity {
         halfGauge.setValue(35.0);*/
     }
 
-    public void InitializeGauges()
-    {
 
-        gauge_AQI.setMaxSpeed(500);
-        gauge_AQI.setTrembleData(0,0);
-        gauge_AQI.makeSections(5, Color.CYAN, Section.Style.ROUND);
-        List<Section> sections = gauge_AQI.getSections();
-        sections.get(0).setColor(Color.GREEN);
-        sections.get(1).setColor(Color.YELLOW);
-        sections.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
-        sections.get(3).setColor(Color.RED);
-        sections.get(4).setColor(Color.rgb(128,0,0));
-        gauge_AQI.speedTo(249);
-
-
-        gauge_NO2.setMaxSpeed(500);
-        gauge_NO2.setTrembleData(0,0);
-        gauge_NO2.makeSections(5, Color.CYAN, Section.Style.SQUARE);
-        List<Section> sections2 = gauge_NO2.getSections();
-        sections2.get(0).setColor(Color.GREEN);
-        sections2.get(1).setColor(Color.YELLOW);
-        sections2.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
-        sections2.get(3).setColor(Color.RED);
-        sections2.get(4).setColor(Color.rgb(128,0,0));
-        gauge_NO2.speedTo(450);
-
-        gauge_PM10.setMaxSpeed(200);
-        gauge_PM10.setTrembleData(0,0);
-        gauge_PM10.makeSections(5, Color.CYAN, Section.Style.ROUND);
-        List<Section> sections3 = gauge_PM10.getSections();
-        sections3.get(0).setColor(Color.GREEN);
-        sections3.get(1).setColor(Color.YELLOW);
-        sections3.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
-        sections3.get(3).setColor(Color.RED);
-        sections3.get(4).setColor(Color.rgb(128,0,0));
-        gauge_PM10.speedTo(10);
-
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
+        getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
+                WindowManager.LayoutParams.FLAG_FULLSCREEN);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
@@ -302,13 +270,15 @@ public class AirQualityActivity extends AppCompatActivity {
                 if(expandableView.getVisibility() == View.GONE) {
                     TransitionManager.beginDelayedTransition(cardView, new AutoTransition());
                     expandableView.setVisibility(View.VISIBLE);
-                    arrowBtn.setBackgroundResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
+                   // arrowBtn.setBackgroundResource(R.drawable.ic_keyboard_arrow_up_black_24dp);
+                    ((MaterialButton)arrowBtn).setIcon(getResources().getDrawable(R.drawable.ic_keyboard_arrow_up_black_24dp));
                 }
                 else
                 {
                     TransitionManager.beginDelayedTransition(cardView, new AutoTransition());
                     expandableView.setVisibility(View.GONE);
-                    arrowBtn.setBackgroundResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
+                   // arrowBtn.setBackgroundResource(R.drawable.ic_keyboard_arrow_down_black_24dp);
+                    ((MaterialButton)arrowBtn).setIcon(getResources().getDrawable(R.drawable.ic_keyboard_arrow_down_black_24dp));
                 }
             }
         });
@@ -574,8 +544,87 @@ public class AirQualityActivity extends AppCompatActivity {
                // return;
             }
         }
-
     }
 
+    public void InitializeGauges()
+    {
+        gauge_AQI.setMaxSpeed(500);
+        gauge_AQI.setTrembleData(0,0);
+        gauge_AQI.makeSections(5, Color.CYAN, Section.Style.ROUND);
+        List<Section> sections = gauge_AQI.getSections();
+        sections.get(0).setColor(Color.GREEN);
+        sections.get(1).setColor(Color.YELLOW);
+        sections.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
+        sections.get(3).setColor(Color.RED);
+        sections.get(4).setColor(Color.rgb(128,0,0));
+        gauge_AQI.speedTo(249);
 
+
+        gauge_NO2.setMaxSpeed(500);
+        gauge_NO2.setTrembleData(0,0);
+        gauge_NO2.makeSections(5, Color.CYAN, Section.Style.SQUARE);
+        List<Section> sections2 = gauge_NO2.getSections();
+        sections2.get(0).setColor(Color.GREEN);
+        sections2.get(1).setColor(Color.YELLOW);
+        sections2.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
+        sections2.get(3).setColor(Color.RED);
+        sections2.get(4).setColor(Color.rgb(128,0,0));
+        gauge_NO2.speedTo(450);
+
+        gauge_PM10.setMaxSpeed(200);
+        gauge_PM10.setTrembleData(0,0);
+        gauge_PM10.makeSections(5, Color.CYAN, Section.Style.ROUND);
+        List<Section> sections3 = gauge_PM10.getSections();
+        sections3.get(0).setColor(Color.GREEN);
+        sections3.get(1).setColor(Color.YELLOW);
+        sections3.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
+        sections3.get(3).setColor(Color.RED);
+        sections3.get(4).setColor(Color.rgb(128,0,0));
+        gauge_PM10.speedTo(10);
+
+        gauge_PM25.setMaxSpeed(200);
+        gauge_PM25.setTrembleData(0,0);
+        gauge_PM25.makeSections(5, Color.CYAN, Section.Style.ROUND);
+        List<Section> sections5 = gauge_PM25.getSections();
+        sections5.get(0).setColor(Color.GREEN);
+        sections5.get(1).setColor(Color.YELLOW);
+        sections5.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
+        sections5.get(3).setColor(Color.RED);
+        sections5.get(4).setColor(Color.rgb(128,0,0));
+        gauge_PM25.speedTo(70);
+
+        gauge_CO.setMaxSpeed(200);
+        gauge_CO.setTrembleData(0,0);
+        gauge_CO.makeSections(5, Color.CYAN, Section.Style.ROUND);
+        List<Section> sections4 = gauge_CO.getSections();
+        sections4.get(0).setColor(Color.GREEN);
+        sections4.get(1).setColor(Color.YELLOW);
+        sections4.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
+        sections4.get(3).setColor(Color.RED);
+        sections4.get(4).setColor(Color.rgb(128,0,0));
+        gauge_CO.speedTo(140);
+
+
+        gauge_O3.setMaxSpeed(200);
+        gauge_O3.setTrembleData(0,0);
+        gauge_O3.makeSections(5, Color.CYAN, Section.Style.ROUND);
+        List<Section> sections6 = gauge_O3.getSections();
+        sections6.get(0).setColor(Color.GREEN);
+        sections6.get(1).setColor(Color.YELLOW);
+        sections6.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
+        sections6.get(3).setColor(Color.RED);
+        sections6.get(4).setColor(Color.rgb(128,0,0));
+        gauge_O3.speedTo(100);
+
+        gauge_SO2.setMaxSpeed(200);
+        gauge_SO2.setTrembleData(0,0);
+        gauge_SO2.makeSections(5, Color.CYAN, Section.Style.SQUARE);
+        List<Section> sections7 = gauge_SO2.getSections();
+        sections7.get(0).setColor(Color.GREEN);
+        sections7.get(1).setColor(Color.YELLOW);
+        sections7.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
+        sections7.get(3).setColor(Color.RED);
+        sections7.get(4).setColor(Color.rgb(128,0,0));
+        gauge_SO2.speedTo(190);
+    }
 }
