@@ -175,7 +175,7 @@ public class BluetoothLEService extends Service {
             int format = BluetoothGattCharacteristic.FORMAT_UINT8;
             int value = characteristic.getValue()[2]; // trimit spre GUI doar byte-ul 2 din frame-ul trimis de dispozitiv
             //final int battery_level = characteristic.getIntValue(format, 0);
-            intent.putExtra(EXTRA_DATA, value);
+            intent.putExtra(EXTRA_DATA, value); // pot sa creez si alt string precum EXTRA_DATA ca sa trimit caracteristici dupa nume/UUID
         }
         if(UUID_Battery_LEVEL.equals(characteristic.getUuid()))
         {

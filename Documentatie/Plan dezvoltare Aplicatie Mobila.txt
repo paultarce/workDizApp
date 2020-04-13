@@ -1,0 +1,45 @@
+
+Ce am : 
+	- comunicare BLE 
+	- Afisare valori caracteristici pe GUI (ceasuri) 
+	- GUI separat pentru conexiune BLE : scanare( cu filtru ) , conectare la device gasit,  conectare la toate serviciile gasite ( serviciu baterie, serviciu AQI , etc )
+	
+	
+Pana voi avea dispozitivul pot sa: 
+
+
+	1)NEAPARAT (cu date mock-uite deocamdata)  Sa aleg o metoda de calcul AQI - din cele din documentatie : nu va fi o metoda în care datele se acumulează în ore intregi ,
+			- Vreau sa vad un AQI in timp real => De prefferat o metoda care nu doar ia indicele maxim - ci agregheaza tot poluantii 
+			- Sa clarific cu unitatile de masura : ce primesc de la senzor , cum transform in ug/m3 si mai apoi in SubIndice
+			- Afisare date in GUI in timp real 
+						
+	
+	2)In functie de timp ramas :
+		- Sa Creez o baza de date : vezi daca FireBase sau SQL Lite - 
+				 - Tabela 1: 
+						- Loc Masurare : cheie primara 
+						- Valori sub-indici - cate un camp pentru fiecare poluant
+						- Valoarea AQI ( in functie de metoda) 
+						- Data si ora masurarii 
+						
+				  - Optiuni din GUI: Start Recording to DB - doar cand am date disponibile inregistrez in GUI 
+		
+		- Sa pot sa iau din DB datele dintr-un anumit loc, pentru o anumita perioada + afisarea lor intr-un grafic
+					
+
+Cand am dispozitivul : 
+
+	NEAPARAT
+	1- mentinere conexiune pe o durata mai lunga 
+	2- Sa primesc date periodic de la senzor - constant 	
+	3- Afisez datele pe GUI 
+	
+	
+	IN FUCNTIE DE TIMP RAMAS: 
+	4 - Inregistrez in baza de date + interogare pe Loc + Perioada
+	
+
+Prezentare PPT Disertatie : IDEI 
+	- prezentare problema mare poluare : context actual - CoVid-19 afecteaza mai mult oamenii din zone poluate 
+	
+	

@@ -51,7 +51,6 @@ import butterknife.ButterKnife;
 //import in.unicodelabs.kdgaugeview.KdGaugeView;
 import pl.pawelkleczkowski.customgauge.CustomGauge;
 
-
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
@@ -73,7 +72,6 @@ import java.util.List;
 public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActivity
 
     private static final String TAG = "MainActivity";
-
 
     @BindView(R.id.startScan)
     Button button;
@@ -98,9 +96,6 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
 
-    /*@BindView(R.id.toolbar)
-    Toolbar toolbar;*/
-
     @BindView(R.id.expandableView)
     LinearLayout expandableView;
 
@@ -113,19 +108,22 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
    /* @BindView(R.id.gauge1)
     CustomGauge gauge1;
 
+    @BindView(R.id.toolbar)
+    Toolbar toolbar;
+
     @BindView(R.id.textView1)
-    TextView textView1;*/
+    TextView textView1;
 
-  /*  @BindView(R.id.halfGauge)
-    HalfGauge halfGauge;*/
+    @BindView(R.id.halfGauge)
+    HalfGauge halfGauge;
 
-   // @BindView(R.id.speedMeter)
-    //KdGaugeView speedView;
+    @BindView(R.id.speedMeter)
+    KdGaugeView speedView;
 
-    /*@BindView(R.id.expandableLayout1)
+    @BindView(R.id.expandableLayout1)
     ExpandableLayout expandabableLayout1;
-*/
-    /*@BindView(R.id.expandableButton1)
+
+    @BindView(R.id.expandableButton1)
     Button expandableButton1;*/
 
     @BindView(R.id.gauge_AQI)
@@ -159,7 +157,6 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     // such as the name, address, class, and bonding state.
     BluetoothDevice bluetoothDevice;
 
-
     //Represents the local device Bluetooth adapter. The BluetoothAdapter lets you perform fundamental Bluetooth tasks, such
     // as initiate device discovery, query a list of bonded (paired) devices, instantiate a BluetoothDevice using a known MAC
     // address, and create a BluetoothServerSocket to listen for connection requests from other devices, and start a scan for Bluetooth LE devices.
@@ -176,7 +173,6 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     private boolean mConnected = false;
 
     private BluetoothLEService mBluetoothLEService;
-
 
     // Handles various events fired by the Service.
     // ACTION_GATT_CONNECTED: connected to a GATT server.
@@ -238,8 +234,6 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         halfGauge.setValue(35.0);*/
     }
 
-
-
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -249,19 +243,21 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
+        mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter(AirQualityActivity.this);
+
         /*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Air Quality Index");
-        setSupportActionBar(toolbar);*/
-        mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter(AirQualityActivity.this);
+        setSupportActionBar(toolbar);
+
 
         //toolbar.setTitle("Air Quality Index");
        /* int value = 80;
         gauge1.setValue(value);
-        textView1.setText(value + "/800");*/
+        textView1.setText(value + "/800");
 
-        setHalfGauge();
+       // setHalfGauge();
        // speedView.setSpeed(167);
-       // speedView.drawSpeedometer();
+       // speedView.drawSpeedometer(); */
         InitializeGauges();
 
         arrowBtn.setOnClickListener(new View.OnClickListener() {
@@ -462,7 +458,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             final ScanSettings settings = new ScanSettings.Builder().build();
             //ScanFilter scanFilter = new ScanFilter.Builder().setServiceUuid(ParcelUuid.fromString(SampleGattAttributes.UUID_AIRQUALITY_SERVICE)).build();
 
-            ScanFilter scanFilter = new ScanFilter.Builder().setDeviceAddress("00:A0:50:1A:D6:A3").build();
+            ScanFilter scanFilter = new ScanFilter.Builder().setDeviceAddress("00:A0:50:1A:D6:A3").build(); // Adresa MAC a modulului BLE
 
             scanFilters.add(scanFilter);
             mHandler.postDelayed(new Runnable() {
@@ -545,6 +541,9 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             }
         }
     }
+
+
+
 
     public void InitializeGauges()
     {
