@@ -12,6 +12,8 @@ Pana voi avea dispozitivul pot sa:
 			- Vreau sa vad un AQI in timp real => De prefferat o metoda care nu doar ia indicele maxim - ci agregheaza tot poluantii 
 			- Sa clarific cu unitatile de masura : ce primesc de la senzor , cum transform in ug/m3 si mai apoi in SubIndice
 			- Afisare date in GUI in timp real 
+			- Notificare cand apare o valoare peste o limita de siguranta
+
 						
 	
 	2)In functie de timp ramas :

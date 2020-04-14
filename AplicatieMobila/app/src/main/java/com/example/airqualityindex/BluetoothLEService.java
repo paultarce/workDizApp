@@ -173,9 +173,28 @@ public class BluetoothLEService extends Service {
         final Intent intent = new Intent(action);
         if (UUID_AirQuality_LEVEL.equals(characteristic.getUuid())) {
             int format = BluetoothGattCharacteristic.FORMAT_UINT8;
-            int value = characteristic.getValue()[2]; // trimit spre GUI doar byte-ul 2 din frame-ul trimis de dispozitiv
+            //int value = characteristic.getValue()[2]; // trimit spre GUI doar byte-ul 2 din frame-ul trimis de dispozitiv
+            String[] valueToSend = new String[2];
+            //Get The Sensor index
+            int sensorIndex = characteristic.getValue()[0];
+            switch (sensorIndex)
+            {
+                case 0: // CO - ppb    1 ppb = 1.145 ug/m3
+                    int value_CO_pbb =  (characteristic.getValue()[2] << 8) | (characteristic.getValue()[3]);
+                    double value_CO_ug = 1.145 * value_CO_pbb;
+                    valueToSend[0] = value_CO_ug + "";
+                    valueToSend[1] = "CO"; // so that MainActivity will know what is the pollutant
+                    break;
+                case 1: // SO2
+                    break;
+                case 2: // NO2
+                    break;
+                default:
+                    break;
+            }
+
             //final int battery_level = characteristic.getIntValue(format, 0);
-            intent.putExtra(EXTRA_DATA, value); // pot sa creez si alt string precum EXTRA_DATA ca sa trimit caracteristici dupa nume/UUID
+            intent.putExtra(EXTRA_DATA, valueToSend); // pot sa creez si alt string precum EXTRA_DATA ca sa trimit caracteristici dupa nume/UUID
         }
         if(UUID_Battery_LEVEL.equals(characteristic.getUuid()))
         {
@@ -260,5 +279,8 @@ public class BluetoothLEService extends Service {
             return BluetoothLEService.this;
         }
     }
+
+
+
 }
 
