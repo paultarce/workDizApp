@@ -201,7 +201,10 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             }
             else if (BluetoothLEService.ACTION_DATA_AVAILABLE.equals(action)) // primesc date de la sevciciul BluetoothLEService
             {
+                String [] bleValues = new String[2];
+                bleValues = intent.getStringArrayExtra(BluetoothLEService.EXTRA_DATA);
                 displayData(intent.getStringExtra(BluetoothLEService.EXTRA_DATA));
+
             }
         }
     };
@@ -497,6 +500,25 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 batteryLevelText.setText(data);
         }
     }
+    private void displayData(String[] data)
+    {
+        if (data[0] != null && data[1] != null) {
+
+            switch(data[1])
+            {
+                case "CO" :
+                    long subIndexValue_CO = AqiUtils.GetSubIndexValue_CO(Integer.parseInt(data[0]));
+                    break;
+                case "SO2":
+                    break;
+                default:
+                    break;
+            }
+
+        }
+
+    }
+
 
     private void displayGattServices(List<BluetoothGattService> gattServices) {
         if (gattServices == null)

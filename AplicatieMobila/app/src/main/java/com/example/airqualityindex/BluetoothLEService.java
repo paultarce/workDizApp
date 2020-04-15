@@ -180,12 +180,16 @@ public class BluetoothLEService extends Service {
             switch (sensorIndex)
             {
                 case 0: // CO - ppb    1 ppb = 1.145 ug/m3
-                    int value_CO_pbb =  (characteristic.getValue()[2] << 8) | (characteristic.getValue()[3]);
+                    int value_CO_pbb =  (characteristic.getValue()[2] << 8) | (characteristic.getValue()[3]); //daca valoarea mea e pe mai multi bytes
                     double value_CO_ug = 1.145 * value_CO_pbb;
-                    valueToSend[0] = value_CO_ug + "";
+                    valueToSend[0] = Double.toString(value_CO_ug);
                     valueToSend[1] = "CO"; // so that MainActivity will know what is the pollutant
                     break;
                 case 1: // SO2
+                    int value_SO2_pbb =  (characteristic.getValue()[2] << 8) | (characteristic.getValue()[3]); //daca valoarea mea e pe mai multi bytes
+                    double value_SO2_ug = 2.62 * value_SO2_pbb;
+                    valueToSend[0] = Double.toString(value_SO2_ug);
+                    valueToSend[1] = "SO2"; // so that MainActivity will know what is the pollutant
                     break;
                 case 2: // NO2
                     break;
