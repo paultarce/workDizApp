@@ -203,8 +203,10 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             {
                 String [] bleValues = new String[2];
                 bleValues = intent.getStringArrayExtra(BluetoothLEService.EXTRA_DATA);
-                displayData(intent.getStringExtra(BluetoothLEService.EXTRA_DATA));
-
+                //displayData(intent.getStringExtra(BluetoothLEService.EXTRA_DATA));
+                displayData(bleValues[0]);
+                PushValueAndGetAQI(bleValues);
+                //displayData(bleValues);
             }
         }
     };
@@ -500,14 +502,19 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 batteryLevelText.setText(data);
         }
     }
-    private void displayData(String[] data)
-    {
-        if (data[0] != null && data[1] != null) {
 
+    long aqi_CO = 0; long aqi_SO2 = 0; long aqi_O3 = 0; long aqi_PM25 = 0; long aqi_PM10 = 0; long aqi_NO2 = 0;
+    long AQI_VALUE = 0;
+    private void PushValueAndGetAQI(String[] data)
+    {
+        if (data[0] != null && data[1] != null)
+        {
+            long subIndexValue = 0;
             switch(data[1])
             {
                 case "CO" :
-                    long subIndexValue_CO = AqiUtils.GetSubIndexValue_CO(Integer.parseInt(data[0]));
+                    subIndexValue = AqiUtils.GetSubIndexValue_CO(Integer.parseInt(data[0]));
+                    gauge_CO.speedTo(subIndexValue);
                     break;
                 case "SO2":
                     break;
@@ -515,8 +522,15 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                     break;
             }
 
+            if(subIndexValue > aqi_CO && subIndexValue > aqi_SO2 && subIndexValue > aqi_O3 && subIndexValue > aqi_PM25
+                    && subIndexValue > aqi_PM10 && subIndexValue > aqi_NO2 )
+            {
+                AQI_VALUE = subIndexValue;
+            }
         }
-
+    }
+    private void displayData(String[] data)
+    {
     }
 
 
@@ -565,19 +579,26 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     }
 
 
-
+   /* private ArrayList<Section> GetSections()
+    {
+        ArrayList<Section> sections = new ArrayList<Section>();
+        //Section s
+    }*/
 
     public void InitializeGauges()
     {
         gauge_AQI.setMaxSpeed(500);
         gauge_AQI.setTrembleData(0,0);
         gauge_AQI.makeSections(5, Color.CYAN, Section.Style.ROUND);
+
+        //ArrayList<Section> sections = new ArrayList<Section>();
         List<Section> sections = gauge_AQI.getSections();
         sections.get(0).setColor(Color.GREEN);
         sections.get(1).setColor(Color.YELLOW);
         sections.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
         sections.get(3).setColor(Color.RED);
         sections.get(4).setColor(Color.rgb(128,0,0));
+        //gauge_AQI.addSections(sections);
         gauge_AQI.speedTo(249);
 
 
