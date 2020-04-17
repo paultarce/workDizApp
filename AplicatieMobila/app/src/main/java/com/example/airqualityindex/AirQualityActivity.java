@@ -68,6 +68,7 @@ import com.google.android.material.button.MaterialButton;
 import java.lang.Object;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActivity
 
@@ -456,6 +457,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     private void startScanning(final boolean enable) {
         bluetoothLeScanner = mBluetoothAdapter.getBluetoothLeScanner();
 
+        //Set<BluetoothDevice> bondedDevices =  mBluetoothAdapter.getBondedDevices(); // asta ??
+
         Handler mHandler = new Handler();
 
         if (enable) {
@@ -526,6 +529,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                     && subIndexValue > aqi_PM10 && subIndexValue > aqi_NO2 )
             {
                 AQI_VALUE = subIndexValue;
+                gauge_AQI.speedTo(subIndexValue);
+                gauge_AQI.setUnit(data[1]); // display the Main Pollutant
             }
         }
     }
@@ -589,17 +594,27 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     {
         gauge_AQI.setMaxSpeed(500);
         gauge_AQI.setTrembleData(0,0);
-        gauge_AQI.makeSections(5, Color.CYAN, Section.Style.ROUND);
+        //gauge_AQI.makeSections(5, Color.CYAN, Section.Style.ROUND);
 
-        //ArrayList<Section> sections = new ArrayList<Section>();
-        List<Section> sections = gauge_AQI.getSections();
+        gauge_AQI.clearSections();
+        List<Section> sectionsAQI = new ArrayList<Section>();
+        Section s1 = new Section(0f,.1f, Color.GREEN); s1.setStyle(Section.Style.SQUARE); sectionsAQI.add(s1);
+        Section s2 = new Section(.1f, .2f, Color.YELLOW); s2.setStyle(Section.Style.SQUARE); sectionsAQI.add(s2);
+        Section s3 = new Section(.2f,.3f, Color.rgb(255,165, 0)); s3.setStyle(Section.Style.SQUARE); sectionsAQI.add(s3);
+        Section s4 = new Section(.3f, .4f, Color.RED); s4.setStyle(Section.Style.SQUARE);  sectionsAQI.add(s4);
+        Section s5 = new Section(.4f, .6f, Color.rgb(128, 0, 128)); s5.setStyle(Section.Style.SQUARE); sectionsAQI.add(s5);
+        Section s6 = new Section(.6f, 1f, Color.rgb(128,0,0)); s6.setStyle(Section.Style.SQUARE); sectionsAQI.add(s6);
+
+        /*List<Section> sections = gauge_AQI.getSections();
         sections.get(0).setColor(Color.GREEN);
         sections.get(1).setColor(Color.YELLOW);
         sections.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
         sections.get(3).setColor(Color.RED);
         sections.get(4).setColor(Color.rgb(128,0,0));
-        //gauge_AQI.addSections(sections);
-        gauge_AQI.speedTo(249);
+        //gauge_AQI.addSections(sections);*/
+
+        gauge_AQI.addSections(sectionsAQI);
+        gauge_AQI.speedTo(250);
 
 
         gauge_NO2.setMaxSpeed(500);
