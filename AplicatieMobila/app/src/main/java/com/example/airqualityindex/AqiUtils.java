@@ -12,13 +12,13 @@ public class AqiUtils {
      Very Unhealthy(201 - 300)    <=>  17.633 -    34.808
      Hazardous( 301 - 500 )       <=>  34.808 -    57.708
     */
-    public static long GetSubIndexValue_CO(int inputRawValue)
+    public static long GetSubIndexValue_CO(double inputRawValue)
     {
         double subIndexValue_double = 0;
         long subIndexValue = 0;
 
         if(inputRawValue < 5038)
-            subIndexValue_double = ((50 - 0) / (5038 - 0)) * (inputRawValue - 0) + 0;
+            subIndexValue_double = 0.00992 * (inputRawValue - 0) + 0; //  (double)(50 - 0) / (5038 - 0))
         else if(inputRawValue < 10.736)
             subIndexValue_double = ((100 - 51) / (10.736 - 5039)) * (inputRawValue - 5039) + 51;
         else if(inputRawValue < 14.198)

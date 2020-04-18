@@ -466,7 +466,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             final ScanSettings settings = new ScanSettings.Builder().build();
             //ScanFilter scanFilter = new ScanFilter.Builder().setServiceUuid(ParcelUuid.fromString(SampleGattAttributes.UUID_AIRQUALITY_SERVICE)).build();
 
-            ScanFilter scanFilter = new ScanFilter.Builder().setDeviceAddress("00:A0:50:1A:D6:A3").build(); // Adresa MAC a modulului BLE
+            //ScanFilter scanFilter = new ScanFilter.Builder().setDeviceAddress("00:A0:50:1A:D6:A3").build(); // Adresa MAC a modulului BLE
+            ScanFilter scanFilter = new ScanFilter.Builder().setDeviceAddress("B4:52:A9:01:8F:11").build(); // Adresa MAC a modulului BLE
 
             scanFilters.add(scanFilter);
             mHandler.postDelayed(new Runnable() {
@@ -516,7 +517,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             switch(data[1])
             {
                 case "CO" :
-                    subIndexValue = AqiUtils.GetSubIndexValue_CO(Integer.parseInt(data[0]));
+                    //subIndexValue = AqiUtils.GetSubIndexValue_CO(Double.parseDouble(data[0]));
+                    subIndexValue = Math.round(Double.parseDouble(data[0]));
                     gauge_CO.speedTo(subIndexValue);
                     break;
                 case "SO2":
@@ -592,19 +594,19 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
     public void InitializeGauges()
     {
-        gauge_AQI.setMaxSpeed(500);
-        gauge_AQI.setTrembleData(0,0);
-        //gauge_AQI.makeSections(5, Color.CYAN, Section.Style.ROUND);
-
-        gauge_AQI.clearSections();
         List<Section> sectionsAQI = new ArrayList<Section>();
-        Section s1 = new Section(0f,.1f, Color.GREEN); s1.setStyle(Section.Style.SQUARE); sectionsAQI.add(s1);
-        Section s2 = new Section(.1f, .2f, Color.YELLOW); s2.setStyle(Section.Style.SQUARE); sectionsAQI.add(s2);
+        Section s1 = new Section(0f,.1f, Color.rgb(34, 139, 34)); s1.setStyle(Section.Style.SQUARE); sectionsAQI.add(s1);
+        Section s2 = new Section(.1f, .2f, Color.rgb(255,222,0)); s2.setStyle(Section.Style.SQUARE); sectionsAQI.add(s2);
         Section s3 = new Section(.2f,.3f, Color.rgb(255,165, 0)); s3.setStyle(Section.Style.SQUARE); sectionsAQI.add(s3);
         Section s4 = new Section(.3f, .4f, Color.RED); s4.setStyle(Section.Style.SQUARE);  sectionsAQI.add(s4);
         Section s5 = new Section(.4f, .6f, Color.rgb(128, 0, 128)); s5.setStyle(Section.Style.SQUARE); sectionsAQI.add(s5);
-        Section s6 = new Section(.6f, 1f, Color.rgb(128,0,0)); s6.setStyle(Section.Style.SQUARE); sectionsAQI.add(s6);
+        Section s6 = new Section(.6f, 1f, Color.rgb(0,0,0)); s6.setStyle(Section.Style.SQUARE); sectionsAQI.add(s6);
 
+        gauge_AQI.setMaxSpeed(500);
+        gauge_AQI.setTrembleData(0,0);
+        gauge_AQI.clearSections();
+        gauge_AQI.addSections(sectionsAQI);
+        gauge_AQI.speedTo(120);
         /*List<Section> sections = gauge_AQI.getSections();
         sections.get(0).setColor(Color.GREEN);
         sections.get(1).setColor(Color.YELLOW);
@@ -613,75 +615,44 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         sections.get(4).setColor(Color.rgb(128,0,0));
         //gauge_AQI.addSections(sections);*/
 
-        gauge_AQI.addSections(sectionsAQI);
-        gauge_AQI.speedTo(250);
-
 
         gauge_NO2.setMaxSpeed(500);
         gauge_NO2.setTrembleData(0,0);
-        gauge_NO2.makeSections(5, Color.CYAN, Section.Style.SQUARE);
-        List<Section> sections2 = gauge_NO2.getSections();
-        sections2.get(0).setColor(Color.GREEN);
-        sections2.get(1).setColor(Color.YELLOW);
-        sections2.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
-        sections2.get(3).setColor(Color.RED);
-        sections2.get(4).setColor(Color.rgb(128,0,0));
-        gauge_NO2.speedTo(450);
+        gauge_NO2.clearSections();
+        gauge_NO2.addSections(sectionsAQI);
+        gauge_NO2.speedTo(49);
 
-        gauge_PM10.setMaxSpeed(200);
+
+        gauge_PM10.setMaxSpeed(500);
         gauge_PM10.setTrembleData(0,0);
-        gauge_PM10.makeSections(5, Color.CYAN, Section.Style.ROUND);
-        List<Section> sections3 = gauge_PM10.getSections();
-        sections3.get(0).setColor(Color.GREEN);
-        sections3.get(1).setColor(Color.YELLOW);
-        sections3.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
-        sections3.get(3).setColor(Color.RED);
-        sections3.get(4).setColor(Color.rgb(128,0,0));
-        gauge_PM10.speedTo(10);
+        gauge_PM10.clearSections();
+        gauge_PM10.addSections(sectionsAQI);
+        gauge_PM10.speedTo(75);
 
-        gauge_PM25.setMaxSpeed(200);
+
+        gauge_PM25.setMaxSpeed(500);
         gauge_PM25.setTrembleData(0,0);
-        gauge_PM25.makeSections(5, Color.CYAN, Section.Style.ROUND);
-        List<Section> sections5 = gauge_PM25.getSections();
-        sections5.get(0).setColor(Color.GREEN);
-        sections5.get(1).setColor(Color.YELLOW);
-        sections5.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
-        sections5.get(3).setColor(Color.RED);
-        sections5.get(4).setColor(Color.rgb(128,0,0));
-        gauge_PM25.speedTo(70);
+        gauge_PM25.clearSections();
+        gauge_PM25.addSections(sectionsAQI);
+        gauge_PM25.speedTo(101);
 
-        gauge_CO.setMaxSpeed(200);
+        gauge_CO.setMaxSpeed(500);
         gauge_CO.setTrembleData(0,0);
-        gauge_CO.makeSections(5, Color.CYAN, Section.Style.ROUND);
-        List<Section> sections4 = gauge_CO.getSections();
-        sections4.get(0).setColor(Color.GREEN);
-        sections4.get(1).setColor(Color.YELLOW);
-        sections4.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
-        sections4.get(3).setColor(Color.RED);
-        sections4.get(4).setColor(Color.rgb(128,0,0));
-        gauge_CO.speedTo(140);
+        gauge_CO.clearSections();
+        gauge_CO.addSections(sectionsAQI);
+        gauge_CO.speedTo(151);
 
 
-        gauge_O3.setMaxSpeed(200);
+        gauge_O3.setMaxSpeed(500);
         gauge_O3.setTrembleData(0,0);
-        gauge_O3.makeSections(5, Color.CYAN, Section.Style.ROUND);
-        List<Section> sections6 = gauge_O3.getSections();
-        sections6.get(0).setColor(Color.GREEN);
-        sections6.get(1).setColor(Color.YELLOW);
-        sections6.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
-        sections6.get(3).setColor(Color.RED);
-        sections6.get(4).setColor(Color.rgb(128,0,0));
-        gauge_O3.speedTo(100);
+        gauge_O3.clearSections();
+        gauge_O3.addSections(sectionsAQI);
+        gauge_O3.speedTo(201);
 
-        gauge_SO2.setMaxSpeed(200);
+        gauge_SO2.setMaxSpeed(500);
         gauge_SO2.setTrembleData(0,0);
-        gauge_SO2.makeSections(5, Color.CYAN, Section.Style.SQUARE);
-        List<Section> sections7 = gauge_SO2.getSections();
-        sections7.get(0).setColor(Color.GREEN);
-        sections7.get(1).setColor(Color.YELLOW);
-        sections7.get(2).setColor(Color.rgb(255,165, 0));// ORANGE
-        sections7.get(3).setColor(Color.RED);
-        sections7.get(4).setColor(Color.rgb(128,0,0));
-        gauge_SO2.speedTo(190);
+        gauge_SO2.clearSections();
+        gauge_SO2.addSections(sectionsAQI);
+        gauge_SO2.speedTo(301);
     }
 }

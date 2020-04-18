@@ -286,7 +286,9 @@
                 app:sv_unitTextSize="10dp"
                 app:sv_unitUnderSpeedText="true"
                 app:sv_textSize="7dp"
-                app:sv_speedometerBackColor="@android:color/white"/>
+                app:sv_speedTextColor="@color/colorPrimaryDark"
+                app:sv_unitTextColor="@color/colorPrimaryDark"
+                app:sv_speedometerBackColor="@color/cardview_shadow_start_color"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -310,7 +312,10 @@
                 app:sv_unit="ppm"
                 app:sv_unitTextSize="10dp"
                 app:sv_unitUnderSpeedText="true"
-                app:sv_textSize="7dp"/>
+                app:sv_textSize="7dp"
+                app:sv_speedTextColor="@color/colorPrimaryDark"
+                app:sv_unitTextColor="@color/colorPrimaryDark"
+                app:sv_speedometerBackColor="@color/cardview_shadow_start_color"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -334,7 +339,10 @@
                 app:sv_unit="ppm"
                 app:sv_unitTextSize="10dp"
                 app:sv_unitUnderSpeedText="true"
-                app:sv_textSize="7dp"/>
+                app:sv_textSize="7dp"
+                app:sv_speedTextColor="@color/colorPrimaryDark"
+                app:sv_unitTextColor="@color/colorPrimaryDark"
+                app:sv_speedometerBackColor="@color/cardview_shadow_start_color"/>
 
 
         </LinearLayout>
@@ -373,7 +381,8 @@
                 app:sv_speedTextPadding="43dp"
                 app:sv_unitUnderSpeedText="true"
                 app:sv_speedTextColor="@color/colorPrimaryDark"
-                app:sv_unitTextColor="@color/colorPrimaryDark"/>
+                app:sv_unitTextColor="@color/colorPrimaryDark"
+                app:sv_speedometerBackColor="@color/cardview_shadow_start_color"/>
 
         </LinearLayout>
 
@@ -405,7 +414,10 @@
                 app:sv_unit="ppm"
                 app:sv_unitTextSize="10dp"
                 app:sv_unitUnderSpeedText="true"
-                app:sv_textSize="7dp"/>
+                app:sv_textSize="7dp"
+                app:sv_speedTextColor="@color/colorPrimaryDark"
+                app:sv_unitTextColor="@color/colorPrimaryDark"
+                app:sv_speedometerBackColor="@color/cardview_shadow_start_color"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -430,7 +442,9 @@
                 app:sv_unitTextSize="10dp"
                 app:sv_unitUnderSpeedText="true"
                 app:sv_textSize="7dp"
-                app:sv_speedometerBackColor="@android:color/white"/>
+                app:sv_speedTextColor="@color/colorPrimaryDark"
+                app:sv_unitTextColor="@color/colorPrimaryDark"
+                app:sv_speedometerBackColor="@color/cardview_shadow_start_color"/>
 
             <TextView
                 android:layout_width="match_parent"
@@ -454,7 +468,10 @@
                 app:sv_unit="ppm"
                 app:sv_unitTextSize="10dp"
                 app:sv_unitUnderSpeedText="true"
-                app:sv_textSize="7dp"/>
+                app:sv_textSize="7dp"
+                app:sv_speedTextColor="@color/colorPrimaryDark"
+                app:sv_unitTextColor="@color/colorPrimaryDark"
+                app:sv_speedometerBackColor="@color/cardview_shadow_start_color"/>
 
 
         </LinearLayout>
