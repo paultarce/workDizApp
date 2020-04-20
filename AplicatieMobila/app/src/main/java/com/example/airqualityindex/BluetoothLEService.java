@@ -17,6 +17,7 @@ import android.util.Log;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
+import java.nio.charset.Charset;
 import java.util.List;
 import java.util.UUID;
 
@@ -172,19 +173,28 @@ public class BluetoothLEService extends Service {
     private void broadcastUpdate(final String action, final BluetoothGattCharacteristic characteristic) { // trimit spre MainACtivity rezultatul
         final Intent intent = new Intent(action);
         if (UUID_AirQuality_LEVEL.equals(characteristic.getUuid())) {
-            int format = BluetoothGattCharacteristic.FORMAT_UINT8;
+            int format = BluetoothGattCharacteristic.FORMAT_UINT32;
             //int value = characteristic.getValue()[2]; // trimit spre GUI doar byte-ul 2 din frame-ul trimis de dispozitiv
             String[] valueToSend = new String[2];
             //Get The Sensor index
-            int sensorIndex = characteristic.getValue()[0];
+            //int sensorIndex = characteristic.getValue()[0];
+           // int sensorIndex = characteristic.getIntValue(format, 0);
+           // String stringValue = characteristic.getStringValue(2);
+
+            //Arduino Sensors
+            int sensorIndex = 0;
+            byte[] inputByteArray = characteristic.getValue();
+            String inputString = new String(inputByteArray, Charset.forName("US-ASCII"));
+            int sensorValue = Integer.parseInt(inputString);
             if(sensorIndex < 0) sensorIndex = 1;
             switch (0)
             {
                 case 0: // CO - ppb    1 ppb = 1.145 ug/m3
                    // int value_CO_pbb =  (characteristic.getValue()[2] << 8) | (characteristic.getValue()[3]); //daca valoarea mea e pe mai multi bytes
-                  //  double value_CO_ug = 1.145 * value_CO_pbb;
+                  //  double value_CO_ug = 1.145 * value_CO_ppb;
 
-                    valueToSend[0] = Double.toString(sensorIndex);
+                    //valueToSend[0] = Double.toString(sensorIndex);
+                    valueToSend[0] =   Double.toString(1.145 * sensorValue);
                     valueToSend[1] = "CO"; // so that MainActivity will know what is the pollutant
                     break;
                 case 1: // SO2

@@ -517,8 +517,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             switch(data[1])
             {
                 case "CO" :
-                    //subIndexValue = AqiUtils.GetSubIndexValue_CO(Double.parseDouble(data[0]));
-                    subIndexValue = Math.round(Double.parseDouble(data[0]));
+                    subIndexValue = AqiUtils.GetSubIndexValue_CO(Double.parseDouble(data[0]));
+                    //subIndexValue = Math.round(Double.parseDouble(data[0]));
                     gauge_CO.speedTo(subIndexValue);
                     break;
                 case "SO2":
