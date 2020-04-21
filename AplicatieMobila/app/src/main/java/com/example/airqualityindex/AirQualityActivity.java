@@ -300,6 +300,23 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             }
         });
 
+        /*button.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
+                for(BluetoothDevice result: pairedDevices) {
+                    if (result.getAddress().equals("B4:52:A9:01:8F:11")) {
+                        bluetoothDevice = result;
+                        deviceAddress.setText(bluetoothDevice.getAddress());
+                        deviceName.setText(bluetoothDevice.getName());
+                        progressBar.setVisibility(View.INVISIBLE);
+                        return;
+                    }
+                }
+
+            }
+        });*/
+
         connectDevice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {

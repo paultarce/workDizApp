@@ -194,7 +194,9 @@ public class BluetoothLEService extends Service {
                   //  double value_CO_ug = 1.145 * value_CO_ppb;
 
                     //valueToSend[0] = Double.toString(sensorIndex);
-                    valueToSend[0] =   Double.toString(1.145 * sensorValue);
+                    //valueToSend[0] =   Double.toString(1.145 * sensorValue);
+                    double ppmValue = sensorValue / 1000.0;
+                    valueToSend[0] =   Double.toString(ppmValue);
                     valueToSend[1] = "CO"; // so that MainActivity will know what is the pollutant
                     break;
                 case 1: // SO2
