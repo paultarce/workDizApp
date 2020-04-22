@@ -58,7 +58,6 @@ public class BluetoothLEService extends Service {
 
     private BluetoothGattCallback bluetoothGattCallback = new BluetoothGattCallback() {
 
-
         @Override
         public void onConnectionStateChange(BluetoothGatt gatt, int status, int newState) {
             super.onConnectionStateChange(gatt, status, newState);
@@ -253,12 +252,12 @@ public class BluetoothLEService extends Service {
         mBluetoothGatt.disconnect();
     }
 
-    public boolean initialize() {
+    public boolean initialize() { // Check https://github.com/googlearchive/android-BluetoothLeGatt/blob/master/Application/src/main/java/com/example/android/bluetoothlegatt/BluetoothLeService.java
         mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter(this);
         return true;
     }
 
-    public boolean connect(@NonNull String address)
+    public boolean connect(@NonNull String address)  // Check https://github.com/googlearchive/android-BluetoothLeGatt/blob/master/Application/src/main/java/com/example/android/bluetoothlegatt/BluetoothLeService.java
     {
         if(mBluetoothAdapter != null && address.equals(bluetoothAddress) && mBluetoothGatt != null)
         {
@@ -284,6 +283,7 @@ public class BluetoothLEService extends Service {
         return true;
     }
 
+    // For Read and SetNotification - check : https://github.com/googlearchive/android-BluetoothLeGatt/blob/master/Application/src/main/java/com/example/android/bluetoothlegatt/BluetoothLeService.java
     public void readCharacteristic(@NonNull BluetoothGattCharacteristic bluetoothGattCharacteristic) {
         mBluetoothGatt.readCharacteristic(bluetoothGattCharacteristic);
     }

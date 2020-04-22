@@ -245,11 +245,16 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         super.onCreate(savedInstanceState);
 
         getWindow().setFlags(WindowManager.LayoutParams.FLAG_FULLSCREEN,
-                WindowManager.LayoutParams.FLAG_FULLSCREEN);
+                WindowManager.LayoutParams.FLAG_FULLSCREEN); // make app fullscreen
         setContentView(R.layout.activity_main);
-        ButterKnife.bind(this);
+        ButterKnife.bind(this); // bind all controls to this
 
         mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter(AirQualityActivity.this);
+
+        if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
+            Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
+            startActivityForResult(enableBtIntent, Constants.REQUEST_BLUETOOTH_ENABLE_CODE);
+        }
 
         /*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Air Quality Index");
@@ -350,10 +355,11 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
                     if (mNotifyCharacteristic != null) {
                         final int charaProp = mNotifyCharacteristic.getProperties();
-                        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
+                        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
                             mBluetoothLEService.readCharacteristic(mNotifyCharacteristic);
+                            //add setCharacteristicNotification here too ???
                         }
-                        if ((charaProp | BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
+                        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
                             mBluetoothLEService.setCharacteristicNotification(mNotifyCharacteristic, true);
                         }
                     }
