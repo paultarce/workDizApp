@@ -75,9 +75,16 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     private static final String TAG = "MainActivity";
 
     @BindView(R.id.startScan)
-    Button button;
+    Button startScan;
+
     @BindView(R.id.connectDevice)
     Button connectDevice;
+
+    @BindView(R.id.getPairedDevice)
+    Button getPairedDevice;
+
+    @BindView(R.id.disconnectDevice)
+    Button disconnectDevice;
 
     @BindView(R.id.deviceState)
     TextView deviceStatus;
@@ -209,6 +216,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 PushValueAndGetAQI(bleValues);
                 //displayData(bleValues);
             }
+
         }
     };
 
@@ -256,6 +264,10 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             startActivityForResult(enableBtIntent, Constants.REQUEST_BLUETOOTH_ENABLE_CODE);
         }
 
+        connectDevice.setEnabled(false);
+        connectService.setEnabled(false);
+        disconnectDevice.setEnabled(false);
+
         /*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Air Quality Index");
         setSupportActionBar(toolbar);
@@ -297,7 +309,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             }
         });*/
 
-        button.setOnClickListener(new View.OnClickListener() {
+        startScan.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 progressBar.setVisibility(View.VISIBLE);
@@ -305,7 +317,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             }
         });
 
-        /*button.setOnClickListener(new View.OnClickListener() {
+        getPairedDevice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
@@ -315,12 +327,13 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                         deviceAddress.setText(bluetoothDevice.getAddress());
                         deviceName.setText(bluetoothDevice.getName());
                         progressBar.setVisibility(View.INVISIBLE);
+                        connectDevice.setEnabled(true);
                         return;
                     }
                 }
 
             }
-        });*/
+        });
 
         connectDevice.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -330,6 +343,13 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                     Intent gattServiceIntent = new Intent(AirQualityActivity.this, BluetoothLEService.class);
                     bindService(gattServiceIntent, mServiceConnection, BIND_AUTO_CREATE);
                 }
+            }
+        });
+
+        disconnectDevice.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                mBluetoothLEService.disconnect();
             }
         });
 
@@ -452,6 +472,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             deviceAddress.setText(bluetoothDevice.getAddress());
             deviceName.setText(bluetoothDevice.getName());
             progressBar.setVisibility(View.INVISIBLE);
+            connectDevice.setEnabled(true);
         }
 
         @Override
@@ -517,6 +538,16 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             @Override
             public void run() {
                 deviceStatus.setText(status);
+                if(status == "connected") {
+                    disconnectDevice.setEnabled(true);
+                    connectDevice.setEnabled(false);
+                    connectService.setEnabled(true);
+                }
+                else{
+                    disconnectDevice.setEnabled(false);
+                    connectDevice.setEnabled(true);
+                    connectService.setEnabled(false);
+                }
             }
         });
     }
@@ -598,6 +629,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                        // gattCharacteristicFound = gattCharacteristic;
                         mNotifyCharacteristics.add(gattCharacteristic);
                         charFound = 1;
+                        connectService.setEnabled(true);
                         //break;
                     }
 
