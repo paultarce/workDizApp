@@ -1,5 +1,5 @@
 package com.example.airqualityindex;
-
+import java.nio.ByteBuffer;
 public class AqiUtils {
 
     //https://www3.epa.gov/airnow/aqi-technical-assistance-document-sept2018.pdf
@@ -12,7 +12,7 @@ public class AqiUtils {
      Very Unhealthy(201 - 300)    <=>  17.633 -    34.808
      Hazardous( 301 - 500 )       <=>  34.808 -    57.708
     */
-    public static long GetSubIndexValue_CO(double inputRawValue)
+    public static long GetSubIndexValue_CO(double inputRawValue)// I Get ppb from sensor
     {
         double subIndexValue_double = 0;
         long subIndexValue = 0;
@@ -29,7 +29,7 @@ public class AqiUtils {
             subIndexValue_double = ((300 - 201) / (34808 - 17634)) * (inputRawValue - 17634) + 201;
         else if(inputRawValue < 57708)
             subIndexValue_double = ((500 - 301) / (57708 - 34809)) * (inputRawValue - 34809) + 301;*/
-
+        inputRawValue = inputRawValue / 1000;
         if(inputRawValue <= 4.4)
             subIndexValue_double = (50 / 4.4) * (inputRawValue - 0) + 0;
         else if(inputRawValue <= 9.4)
@@ -47,6 +47,12 @@ public class AqiUtils {
 
         return subIndexValue ;
 
+    }
+
+    public static int GetIntFromByteArray(byte[] inputByteArray)
+    {
+        ByteBuffer wrapped = ByteBuffer.wrap(inputByteArray); // big-endian by default
+        return wrapped.getInt(); // 1
     }
 
 }

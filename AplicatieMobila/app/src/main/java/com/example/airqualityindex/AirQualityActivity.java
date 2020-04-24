@@ -212,8 +212,15 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 String [] bleValues = new String[2];
                 bleValues = intent.getStringArrayExtra(BluetoothLEService.EXTRA_DATA);
                 //displayData(intent.getStringExtra(BluetoothLEService.EXTRA_DATA));
-                displayData(bleValues[0]);
-                PushValueAndGetAQI(bleValues);
+                if(bleValues[0].equals("BATTERY"))
+                {
+                    displayData(bleValues);
+                }
+                else if(bleValues[0].equals("SensorValues"))
+                {
+                    PushValueAndGetAQI(bleValues);
+                }
+                //
                 //displayData(bleValues);
             }
 
@@ -322,7 +329,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             public void onClick(View v) {
                 Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
                 for(BluetoothDevice result: pairedDevices) {
-                    if (result.getAddress().equals("B4:52:A9:01:8F:11")) {
+                    if (result.getAddress().equals("00:A0:50:1A:D6:A3")) {
                         bluetoothDevice = result;
                         deviceAddress.setText(bluetoothDevice.getAddress());
                         deviceName.setText(bluetoothDevice.getName());
@@ -510,8 +517,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             final ScanSettings settings = new ScanSettings.Builder().build();
             //ScanFilter scanFilter = new ScanFilter.Builder().setServiceUuid(ParcelUuid.fromString(SampleGattAttributes.UUID_AIRQUALITY_SERVICE)).build();
 
-            //ScanFilter scanFilter = new ScanFilter.Builder().setDeviceAddress("00:A0:50:1A:D6:A3").build(); // Adresa MAC a modulului BLE
-            ScanFilter scanFilter = new ScanFilter.Builder().setDeviceAddress("B4:52:A9:01:8F:11").build(); // Adresa MAC a modulului BLE
+            ScanFilter scanFilter = new ScanFilter.Builder().setDeviceAddress("00:A0:50:1A:D6:A3").build(); // Adresa MAC a modulului BLE
+            //ScanFilter scanFilter = new ScanFilter.Builder().setDeviceAddress("B4:52:A9:01:8F:11").build(); // Adresa MAC a modulului BLE
 
             scanFilters.add(scanFilter);
             mHandler.postDelayed(new Runnable() {
@@ -568,14 +575,18 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         if (data[0] != null && data[1] != null)
         {
             long subIndexValue = 0;
-            switch(data[1])
+            switch(data[0])
             {
                 case "CO" :
-                    subIndexValue = AqiUtils.GetSubIndexValue_CO(Double.parseDouble(data[0]));
+                    subIndexValue = AqiUtils.GetSubIndexValue_CO(Double.parseDouble(data[1]));
                     //subIndexValue = Math.round(Double.parseDouble(data[0]));
                     gauge_CO.speedTo(subIndexValue);
                     break;
                 case "SO2":
+                    break;
+                case "NO2":
+                    break;
+                case "O3":
                     break;
                 default:
                     break;
@@ -592,6 +603,22 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     }
     private void displayData(String[] data)
     {
+        if (data[0] != null && data[1] != null) {
+            long subIndexValue = 0;
+            switch (data[0]) {
+                case "CO":
+                    //subIndexValue = AqiUtils.GetSubIndexValue_CO(Double.parseDouble(data[0]));
+                    //subIndexValue = Math.round(Double.parseDouble(data[0]));
+                    gauge_CO.speedTo(subIndexValue);
+                    airQualityLevel.setText(data[0]);
+                    break;
+                case "BATTERY":
+                    batteryLevelText.setText(data[1] + "%");
+                    break;
+                default:
+                    break;
+            }
+        }
     }
 
 

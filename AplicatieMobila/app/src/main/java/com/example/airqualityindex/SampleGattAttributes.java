@@ -21,11 +21,11 @@ public class SampleGattAttributes {
     public static final String UUID_BATTERY_SERVICE = "0000180f-0000-1000-8000-00805f9b34fb"; // serviciu
     public static final String UUID_BATTERY_LEVEL_UUID = "00002a19-0000-1000-8000-00805f9b34fb"; //caracteristica
     //CELE 2 de mai JOS
-   /* public static final String UUID_AIRQUALITY_SERVICE = "26d2a5e0-7b2c-11e6-8b77-86f30ca893d3"; // serviciu
-    public static final String UUID_AIRQUALITY_LEVEL_UUID = "26d2a5e4-7b2c-11e6-8b77-86f30ca893d3"; //caracteristica*/
+    public static final String UUID_AIRQUALITY_SERVICE = "26d2a5e0-7b2c-11e6-8b77-86f30ca893d3"; // serviciu
+    public static final String UUID_AIRQUALITY_LEVEL_UUID = "26d2a5e4-7b2c-11e6-8b77-86f30ca893d3"; //caracteristica
 
-    public static final String UUID_AIRQUALITY_SERVICE = "0000ffe0-0000-1000-8000-00805f9b34fb"; // serviciu
-    public static final String UUID_AIRQUALITY_LEVEL_UUID = "0000ffe1-0000-1000-8000-00805f9b34fb"; //caracteristica
+    public static final String UUID_AIRQUALITY_SERVICE_Arduino = "0000ffe0-0000-1000-8000-00805f9b34fb"; // serviciu
+    public static final String UUID_AIRQUALITY_LEVEL_UUID_Arduino = "0000ffe1-0000-1000-8000-00805f9b34fb"; //caracteristica
 
     private static HashMap<String, String> attributes = new HashMap();
 

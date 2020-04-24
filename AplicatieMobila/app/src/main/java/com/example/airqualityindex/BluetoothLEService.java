@@ -18,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 
 import java.nio.charset.Charset;
+import java.util.Arrays;
 import java.util.List;
 import java.util.UUID;
 
@@ -171,22 +172,25 @@ public class BluetoothLEService extends Service {
 
     private void broadcastUpdate(final String action, final BluetoothGattCharacteristic characteristic) { // trimit spre MainACtivity rezultatul
         final Intent intent = new Intent(action);
+        String[] valueToSend_Battery = new String[2];
         if (UUID_AirQuality_LEVEL.equals(characteristic.getUuid())) {
             int format = BluetoothGattCharacteristic.FORMAT_UINT32;
-            //int value = characteristic.getValue()[2]; // trimit spre GUI doar byte-ul 2 din frame-ul trimis de dispozitiv
-            String[] valueToSend = new String[2];
+           // int sensorValue = characteristic.getValue()[2]; // trimit spre GUI doar byte-ul 2 din frame-ul trimis de dispozitiv
+
             //Get The Sensor index
-            //int sensorIndex = characteristic.getValue()[0];
-           // int sensorIndex = characteristic.getIntValue(format, 0);
-           // String stringValue = characteristic.getStringValue(2);
+
+            //int sensorIndex = characteristic.getIntValue(format, 0);
+            //String stringValue = characteristic.getStringValue(2);
+
 
             //Arduino Sensors
-            int sensorIndex = 0;
+           /* int sensorIndex = 0;
             byte[] inputByteArray = characteristic.getValue();
             String inputString = new String(inputByteArray, Charset.forName("US-ASCII"));
             int sensorValue = Integer.parseInt(inputString);
-            if(sensorIndex < 0) sensorIndex = 1;
-            switch (0)
+            if(sensorIndex < 0) sensorIndex = 1;*/
+
+           /* switch (0)
             {
                 case 0: // CO - ppb    1 ppb = 1.145 ug/m3
                    // int value_CO_pbb =  (characteristic.getValue()[2] << 8) | (characteristic.getValue()[3]); //daca valoarea mea e pe mai multi bytes
@@ -208,17 +212,35 @@ public class BluetoothLEService extends Service {
                     break;
                 default:
                     break;
-            }
+            }*/
+            byte[] receivedBytes = characteristic.getValue();
+            String[] sensorValues = new String[5];
+            if(receivedBytes.length == 17) // get SPEC sensor values - in ppb
+            {
+                int CO_Value = AqiUtils.GetIntFromByteArray(new byte[]{receivedBytes[1], receivedBytes[2], receivedBytes[3], receivedBytes[4]});
+                int NO2_Value = AqiUtils.GetIntFromByteArray(Arrays.copyOfRange(receivedBytes, 5, 8));
+                int SO2_Value = AqiUtils.GetIntFromByteArray(Arrays.copyOfRange(receivedBytes, 9, 12));
+                int O3_Value = AqiUtils.GetIntFromByteArray(Arrays.copyOfRange(receivedBytes, 13, 16));
 
+                sensorValues[0] = "SensorValues";
+                sensorValues[1] =  String.valueOf(CO_Value);
+                sensorValues[2] =  String.valueOf(NO2_Value);
+                sensorValues[3] =  String.valueOf(SO2_Value);
+                sensorValues[4] =  String.valueOf(O3_Value);
+            }
             //final int battery_level = characteristic.getIntValue(format, 0);
-            intent.putExtra(EXTRA_DATA, valueToSend); // pot sa creez si alt string precum EXTRA_DATA ca sa trimit caracteristici dupa nume/UUID
+            intent.putExtra(EXTRA_DATA, sensorValues); // pot sa creez si alt string precum EXTRA_DATA ca sa trimit caracteristici dupa nume/UUID
         }
         if(UUID_Battery_LEVEL.equals(characteristic.getUuid()))
         {
             int format = BluetoothGattCharacteristic.FORMAT_UINT8;
             //int value = characteristic.getValue()[2];
             final int battery_level = characteristic.getIntValue(format, 0);
-            intent.putExtra(EXTRA_DATA, battery_level+"%");
+
+            valueToSend_Battery[0] = "BATTERY";
+            valueToSend_Battery[1] = String.valueOf(battery_level);
+
+            intent.putExtra(EXTRA_DATA, valueToSend_Battery);
         }
         sendBroadcast(intent);
     }
