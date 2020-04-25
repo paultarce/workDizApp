@@ -209,7 +209,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             }
             else if (BluetoothLEService.ACTION_DATA_AVAILABLE.equals(action)) // primesc date de la sevciciul BluetoothLEService
             {
-                String [] bleValues = new String[2];
+                String [] bleValues = new String[5];
                 bleValues = intent.getStringArrayExtra(BluetoothLEService.EXTRA_DATA);
                 //displayData(intent.getStringExtra(BluetoothLEService.EXTRA_DATA));
                 if(bleValues[0].equals("BATTERY"))
@@ -388,6 +388,9 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                         }
                         if ((charaProp & BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
                             mBluetoothLEService.setCharacteristicNotification(mNotifyCharacteristic, true);
+                        }
+                        if ((charaProp & BluetoothGattCharacteristic.PROPERTY_WRITE) > 0){
+                            mBluetoothLEService.writeCharacteristic(mNotifyCharacteristic); // naming not
                         }
                     }
                 }
@@ -572,7 +575,41 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     long AQI_VALUE = 0;
     private void PushValueAndGetAQI(String[] data)
     {
-        if (data[0] != null && data[1] != null)
+        long subIndexValue = 0;
+        long subIndexValue_CO = AqiUtils.GetSubIndexValue_CO(Double.parseDouble(data[1])); gauge_CO.speedTo(subIndexValue);
+        long subIndexValue_O3 = 0;
+        long subIndexValue_NO2 = 0;
+        long subIndexValue_SO2 = 0;
+
+        airQualityLevel.setText(data[1]);
+
+        if(subIndexValue_CO > subIndexValue_O3 && subIndexValue_CO > subIndexValue_NO2 && subIndexValue_CO > subIndexValue_SO2)
+        {
+            AQI_VALUE = subIndexValue_CO;
+            gauge_AQI.speedTo(subIndexValue_CO);
+            gauge_AQI.setUnit("CO"); // display the Main Pollutant
+        }
+        if(subIndexValue_O3 > subIndexValue_NO2 && subIndexValue_O3 > subIndexValue_CO && subIndexValue_O3 > subIndexValue_SO2)
+        {
+            AQI_VALUE = subIndexValue_O3;
+            gauge_AQI.speedTo(subIndexValue_O3);
+            gauge_AQI.setUnit("O3"); // display the Main Pollutant
+        }
+        if(subIndexValue_NO2 > subIndexValue_O3 && subIndexValue_NO2 > subIndexValue_NO2 && subIndexValue_NO2 > subIndexValue_CO)
+        {
+            AQI_VALUE = subIndexValue_NO2;
+            gauge_AQI.speedTo(subIndexValue_NO2);
+            gauge_AQI.setUnit("NO2"); // display the Main Pollutant
+        }
+        if(subIndexValue_SO2 > subIndexValue_O3 && subIndexValue_SO2 > subIndexValue_NO2 && subIndexValue_SO2 > subIndexValue_CO)
+        {
+            AQI_VALUE = subIndexValue_NO2;
+            gauge_AQI.speedTo(subIndexValue_NO2);
+            gauge_AQI.setUnit("NO2"); // display the Main Pollutant
+        }
+
+
+       /* if (data[0] != null && data[1] != null)
         {
             long subIndexValue = 0;
             switch(data[0])
@@ -599,7 +636,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 gauge_AQI.speedTo(subIndexValue);
                 gauge_AQI.setUnit(data[1]); // display the Main Pollutant
             }
-        }
+        }*/
     }
     private void displayData(String[] data)
     {

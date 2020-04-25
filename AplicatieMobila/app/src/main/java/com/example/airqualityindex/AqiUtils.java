@@ -29,7 +29,7 @@ public class AqiUtils {
             subIndexValue_double = ((300 - 201) / (34808 - 17634)) * (inputRawValue - 17634) + 201;
         else if(inputRawValue < 57708)
             subIndexValue_double = ((500 - 301) / (57708 - 34809)) * (inputRawValue - 34809) + 301;*/
-        inputRawValue = inputRawValue / 1000;
+        inputRawValue = inputRawValue / 1000; // Transform to ppm - as the standard is for CO
         if(inputRawValue <= 4.4)
             subIndexValue_double = (50 / 4.4) * (inputRawValue - 0) + 0;
         else if(inputRawValue <= 9.4)
