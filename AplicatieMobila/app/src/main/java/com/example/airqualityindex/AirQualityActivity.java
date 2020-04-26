@@ -275,6 +275,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         connectService.setEnabled(false);
         disconnectDevice.setEnabled(false);
 
+        //FIREBASE -- https://airqualityindex-d1fd2.firebaseio.com/
+
         /*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         toolbar.setTitle("Air Quality Index");
         setSupportActionBar(toolbar);
@@ -377,6 +379,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         connectService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+
+                Toast.makeText(AirQualityActivity.this, "Connecting to service...", Toast.LENGTH_LONG).show();
 
                 for (BluetoothGattCharacteristic mNotifyCharacteristic: mNotifyCharacteristics) {
 
