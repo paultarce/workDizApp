@@ -1,4 +1,7 @@
 package com.example.airqualityindex;
+import com.example.airqualityindex.Models.Measurements;
+import com.google.firebase.database.DatabaseReference;
+
 import java.nio.ByteBuffer;
 public class AqiUtils {
 
@@ -30,29 +33,36 @@ public class AqiUtils {
         else if(inputRawValue < 57708)
             subIndexValue_double = ((500 - 301) / (57708 - 34809)) * (inputRawValue - 34809) + 301;*/
         inputRawValue = inputRawValue / 1000; // Transform to ppm - as the standard is for CO
-        if(inputRawValue <= 4.4)
+        if (inputRawValue <= 4.4)
             subIndexValue_double = (50 / 4.4) * (inputRawValue - 0) + 0;
-        else if(inputRawValue <= 9.4)
+        else if (inputRawValue <= 9.4)
             subIndexValue_double = (49 / 4.9) * (inputRawValue - 4.5) + 51;
-        else if(inputRawValue <= 12.4)
+        else if (inputRawValue <= 12.4)
             subIndexValue_double = (49 / 2.9) * (inputRawValue - 9.5) + 101;
-        else if(inputRawValue <= 15.4)
+        else if (inputRawValue <= 15.4)
             subIndexValue_double = (49 / 2.9) * (inputRawValue - 12.5) + 151;
-        else if(inputRawValue <= 30.4)
+        else if (inputRawValue <= 30.4)
             subIndexValue_double = (99 / 14.9) * (inputRawValue - 15.5) + 201;
-        else if(inputRawValue <= 50.4)
+        else if (inputRawValue <= 50.4)
             subIndexValue_double = (199 / 19.9) * (inputRawValue - 30.5) + 301;
 
         subIndexValue = Math.round(subIndexValue_double);
 
-        return subIndexValue ;
+        return subIndexValue;
 
     }
 
-    public static int GetIntFromByteArray(byte[] inputByteArray)
-    {
+    public static int GetIntFromByteArray(byte[] inputByteArray) {
         ByteBuffer wrapped = ByteBuffer.wrap(inputByteArray); // big-endian by default
         return wrapped.getInt(); // 1
+    }
+
+
+    public static void SaveMeasurementToDatabase(DatabaseReference databaseAQI, Measurements measurement)
+    {
+
+       String id = databaseAQI.push().getKey();
+
     }
 
 }

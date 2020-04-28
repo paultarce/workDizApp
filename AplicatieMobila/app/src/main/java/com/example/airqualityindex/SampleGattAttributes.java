@@ -31,14 +31,15 @@ public class SampleGattAttributes {
         // DEVICE SERVIE :
         attributes.put(UUID_AIRQUALITY_SERVICE, "AirQuality Service");
         //DEVICE CHARACTERISTICS
-       /* attributes.put(CHARACTERISTIC_BME_DATA_UUID, "BME_DATA");
+       /*attributes.put(CHARACTERISTIC_BME_DATA_UUID, "BME_DATA");
         attributes.put(CHARACTERISTIC_PMS_DATA_UUID, "PMS_DATA");
         attributes.put(CHARACTERISTIC_SPEC_DATA_UUID, "SPEC_DATA");
         attributes.put(CHARACTERISTIC_SENSORS_DATA_UUID, "SENSORS_DATA");
         attributes.put(CHARACTERISTIC_DEVICE_CONFIG_UUID, "DEVICE_CONFIG");
         attributes.put(CHARACTERISTIC_TIMESTAMP_UUID, "TIMESTAMP");
         attributes.put(CHARACTERISTIC_DEVICE_INFO_UUID, "DEVICE_INFO");*/
-        attributes.put(CHARACTERISTIC_SENSORS_DATA_UUID, "SENSORS_DATA");
+        //attributes.put(CHARACTERISTIC_SENSORS_DATA_UUID, "SENSORS_DATA");
+        attributes.put(CHARACTERISTIC_SPEC_DATA_UUID, "SPEC_DATA");
         //attributes.put(CHARACTERISTIC_SPEC_DATA_UUID, "SPEC_DATA");
 
         /*attributes.put(UUID_BATTERY_LEVEL_UUID, "Battery level");

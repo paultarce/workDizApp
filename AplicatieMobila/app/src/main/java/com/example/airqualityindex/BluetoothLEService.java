@@ -39,7 +39,10 @@ public class BluetoothLEService extends Service {
 
 
     public final static UUID UUID_AirQuality_LEVEL =
-            UUID.fromString(SampleGattAttributes.CHARACTERISTIC_SENSORS_DATA_UUID);
+            UUID.fromString(SampleGattAttributes.CHARACTERISTIC_SPEC_DATA_UUID);
+
+    /*public final static UUID UUID_AirQuality_LEVEL =
+            UUID.fromString(SampleGattAttributes.CHARACTERISTIC_SENSORS_DATA_UUID);*/
 
     public final static UUID UUID_Battery_LEVEL =
             UUID.fromString(SampleGattAttributes.UUID_BATTERY_LEVEL_UUID);

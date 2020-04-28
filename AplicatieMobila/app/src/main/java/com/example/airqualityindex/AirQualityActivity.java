@@ -61,9 +61,12 @@ import androidx.core.content.ContextCompat;
 
 import com.ekn.gruzer.gaugelibrary.HalfGauge;
 import com.ekn.gruzer.gaugelibrary.Range;
+import com.example.airqualityindex.Models.Measurements;
 import com.github.anastr.speedviewlib.TubeSpeedometer;
 import com.github.anastr.speedviewlib.components.Section;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
 
 import java.lang.Object;
 import java.util.ArrayList;
@@ -182,6 +185,10 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
     private BluetoothLEService mBluetoothLEService;
 
+    private DatabaseReference  databaseAQI;
+
+    Handler readHandler = new Handler();
+
     // Handles various events fired by the Service.
     // ACTION_GATT_CONNECTED: connected to a GATT server.
     // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
@@ -220,40 +227,9 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 {
                     PushValueAndGetAQI(bleValues);
                 }
-                //
-                //displayData(bleValues);
             }
-
         }
     };
-
-    public void setHalfGauge()
-    {
-       /* Range range = new Range();
-        range.setColor(Color.parseColor("#00b20b"));
-        range.setFrom(0);
-        range.setTo(50.0);
-
-        Range range2 = new Range();
-        range2.setColor(Color.parseColor("#E3E500"));
-        range2.setFrom(50);
-        range2.setTo(100);
-
-        Range range3 = new Range();
-        range3.setColor(Color.parseColor("#ce0000"));
-        range3.setFrom(100);
-        range3.setTo(150);
-
-        //add color ranges to gauge
-        halfGauge.addRange(range);
-        halfGauge.addRange(range2);
-        halfGauge.addRange(range3);
-
-        //set min max and current value
-        halfGauge.setMinValue(0.0);
-        halfGauge.setMaxValue(150.0);
-        halfGauge.setValue(35.0);*/
-    }
 
     @Override
     public void onCreate(Bundle savedInstanceState) {
@@ -276,20 +252,9 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         disconnectDevice.setEnabled(false);
 
         //FIREBASE -- https://airqualityindex-d1fd2.firebaseio.com/
+        //databaseAQI = FirebaseDatabase.getInstance().getReference("measurements");
+        //FirebaseDatabase.getInstance().getReference().child("measurements").child("CO").setValue("3.4");
 
-        /*Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        toolbar.setTitle("Air Quality Index");
-        setSupportActionBar(toolbar);
-
-
-        //toolbar.setTitle("Air Quality Index");
-       /* int value = 80;
-        gauge1.setValue(value);
-        textView1.setText(value + "/800");
-
-       // setHalfGauge();
-       // speedView.setSpeed(167);
-       // speedView.drawSpeedometer(); */
         InitializeGauges();
 
         arrowBtn.setOnClickListener(new View.OnClickListener() {
@@ -310,13 +275,6 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 }
             }
         });
-
-       /* expandableButton1.setOnClickListener(new View.OnClickListener() {
-            @Override
-            public void onClick(View v) {
-              //  expandabableLayout1.toggle();
-            }
-        });*/
 
         startScan.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -340,7 +298,6 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                         return;
                     }
                 }
-
             }
         });
 
@@ -358,6 +315,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         disconnectDevice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                readHandler.removeCallbacks(runnableCode);
                 mBluetoothLEService.disconnect();
             }
         });
@@ -389,6 +347,11 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                         if ((charaProp & BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
                             mBluetoothLEService.readCharacteristic(mNotifyCharacteristic);
                             //add setCharacteristicNotification here too ???
+                            if(mNotifyCharacteristic.getUuid().toString().equals(SampleGattAttributes.CHARACTERISTIC_SPEC_DATA_UUID))
+                            {
+                                specDataCharacteristic = mNotifyCharacteristic;
+                                readHandler.post(runnableCode);
+                            }
                         }
                         if ((charaProp & BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
                             mBluetoothLEService.setCharacteristicNotification(mNotifyCharacteristic, true);
@@ -402,6 +365,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         });
 
     }
+
+    BluetoothGattCharacteristic specDataCharacteristic;
 
     // Menu icons are inflated just as they were with actionbar
     @Override
@@ -558,6 +523,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                     connectService.setEnabled(true);
                 }
                 else{
+                    readHandler.removeCallbacks(runnableCode);
                     disconnectDevice.setEnabled(false);
                     connectDevice.setEnabled(true);
                     connectService.setEnabled(false);
@@ -577,6 +543,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
     long aqi_CO = 0; long aqi_SO2 = 0; long aqi_O3 = 0; long aqi_PM25 = 0; long aqi_PM10 = 0; long aqi_NO2 = 0;
     long AQI_VALUE = 0;
+
     private void PushValueAndGetAQI(String[] data)
     {
         long subIndexValue = 0;
@@ -611,7 +578,10 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             gauge_AQI.speedTo(subIndexValue_NO2);
             gauge_AQI.setUnit("NO2"); // display the Main Pollutant
         }
+        Measurements measurement = new Measurements(subIndexValue_CO, subIndexValue_SO2, subIndexValue_NO2, subIndexValue_O3, AQI_VALUE, "HOME");
 
+        // Save to FIREBASE
+        //AqiUtils.SaveMeasurementToDatabase(databaseAQI,measurement);
 
        /* if (data[0] != null && data[1] != null)
         {
@@ -708,12 +678,14 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         }
     }
 
-
-   /* private ArrayList<Section> GetSections()
-    {
-        ArrayList<Section> sections = new ArrayList<Section>();
-        //Section s
-    }*/
+    private Runnable runnableCode = new Runnable() {
+        @Override
+        public void run() {
+            //do something here
+            mBluetoothLEService.readCharacteristic(specDataCharacteristic);
+            readHandler.postDelayed(this, 5000);
+        }
+    };
 
     public void InitializeGauges()
     {
