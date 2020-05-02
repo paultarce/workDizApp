@@ -10,6 +10,7 @@ public class Measurements {
 
     public String place;
     public long date; // timestamp
+    public String id;
 
     public Measurements(long CO, long SO2, long NO2, long O3, long AQI, String place) {
         this.CO = CO;

@@ -15,6 +15,7 @@ import android.view.WindowManager;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
 import android.bluetooth.BluetoothAdapter;
@@ -107,6 +108,9 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
 
+    @BindView(R.id.switchSaveDB)
+    Switch switchSaveDB;
+
     @BindView(R.id.expandableView)
     LinearLayout expandableView;
 
@@ -186,7 +190,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     private BluetoothLEService mBluetoothLEService;
 
     private DatabaseReference  databaseAQI;
-
+    List<Measurements> measurementsDB;
     Handler readHandler = new Handler();
 
     // Handles various events fired by the Service.
@@ -225,7 +229,10 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 }
                 else if(bleValues[0].equals("SensorValues"))
                 {
+                    airQualityLevel.setText(bleValues[1]);
+
                     PushValueAndGetAQI(bleValues);
+
                 }
             }
         }
@@ -242,6 +249,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
         mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter(AirQualityActivity.this);
 
+
+
         if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
             Intent enableBtIntent = new Intent(BluetoothAdapter.ACTION_REQUEST_ENABLE);
             startActivityForResult(enableBtIntent, Constants.REQUEST_BLUETOOTH_ENABLE_CODE);
@@ -252,8 +261,9 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         disconnectDevice.setEnabled(false);
 
         //FIREBASE -- https://airqualityindex-d1fd2.firebaseio.com/
-        //databaseAQI = FirebaseDatabase.getInstance().getReference("measurements");
+        databaseAQI = FirebaseDatabase.getInstance().getReference("measurements");
         //FirebaseDatabase.getInstance().getReference().child("measurements").child("CO").setValue("3.4");
+        measurementsDB = new ArrayList<>();
 
         InitializeGauges();
 
@@ -363,7 +373,6 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 }
             }
         });
-
     }
 
     BluetoothGattCharacteristic specDataCharacteristic;
@@ -552,8 +561,6 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         long subIndexValue_NO2 = 0;
         long subIndexValue_SO2 = 0;
 
-        airQualityLevel.setText(data[1]);
-
         if(subIndexValue_CO > subIndexValue_O3 && subIndexValue_CO > subIndexValue_NO2 && subIndexValue_CO > subIndexValue_SO2)
         {
             AQI_VALUE = subIndexValue_CO;
@@ -578,11 +585,14 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             gauge_AQI.speedTo(subIndexValue_NO2);
             gauge_AQI.setUnit("NO2"); // display the Main Pollutant
         }
-        Measurements measurement = new Measurements(subIndexValue_CO, subIndexValue_SO2, subIndexValue_NO2, subIndexValue_O3, AQI_VALUE, "HOME");
 
-        // Save to FIREBASE
-        //AqiUtils.SaveMeasurementToDatabase(databaseAQI,measurement);
+        if(switchSaveDB.isChecked()) {
+            Measurements measurement = new Measurements(subIndexValue_CO, subIndexValue_SO2, subIndexValue_NO2, subIndexValue_O3, AQI_VALUE, "HOME");
 
+            // Save to FIREBASE
+            AqiUtils.SaveMeasurementToDatabase(databaseAQI, measurement);
+            Toast.makeText(this, "Measurement added", Toast.LENGTH_SHORT).show();
+        }
        /* if (data[0] != null && data[1] != null)
         {
             long subIndexValue = 0;
@@ -678,12 +688,14 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         }
     }
 
+
+
     private Runnable runnableCode = new Runnable() {
         @Override
         public void run() {
             //do something here
             mBluetoothLEService.readCharacteristic(specDataCharacteristic);
-            readHandler.postDelayed(this, 5000);
+            readHandler.postDelayed(this, 20000);
         }
     };
 

@@ -478,6 +478,36 @@
 
     </LinearLayout>
 
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="horizontal"
+        android:layout_marginTop="380dp"
+        android:layout_marginRight="10dp"
+        android:layout_marginStart="5dp"
+        android:layout_marginLeft="10dp"
+        >
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/switchSaveDB"
+        android:gravity="center"
+        android:layout_marginLeft="5dp"
+
+        >
+
+    </Switch>
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Save Data to DB"
+            android:gravity="center"
+            android:textStyle="bold"
+            android:textColor="@color/colorPrimaryDark"
+            android:layout_gravity="center"
+            android:layout_marginLeft="10dp"
+            />
+    </LinearLayout>
 
    <!-- <com.google.android.material.floatingactionbutton.FloatingActionButton
         android:id="@+id/fab"

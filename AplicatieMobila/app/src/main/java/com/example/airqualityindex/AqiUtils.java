@@ -1,4 +1,6 @@
 package com.example.airqualityindex;
+import android.widget.Toast;
+
 import com.example.airqualityindex.Models.Measurements;
 import com.google.firebase.database.DatabaseReference;
 
@@ -62,6 +64,10 @@ public class AqiUtils {
     {
 
        String id = databaseAQI.push().getKey();
+       measurement.id = id;
+
+       databaseAQI.child(id).setValue(measurement);
+
 
     }
 
