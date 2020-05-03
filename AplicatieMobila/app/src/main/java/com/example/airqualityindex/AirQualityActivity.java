@@ -12,9 +12,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
 import android.widget.ProgressBar;
+import android.widget.Spinner;
 import android.widget.Switch;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -45,6 +47,8 @@ import android.widget.Button;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+
+import androidx.annotation.NonNull;
 import androidx.appcompat.widget.Toolbar;
 
 import butterknife.BindView;
@@ -66,8 +70,11 @@ import com.example.airqualityindex.Models.Measurements;
 import com.github.anastr.speedviewlib.TubeSpeedometer;
 import com.github.anastr.speedviewlib.components.Section;
 import com.google.android.material.button.MaterialButton;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
 
 import java.lang.Object;
 import java.util.ArrayList;
@@ -90,6 +97,12 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     @BindView(R.id.disconnectDevice)
     Button disconnectDevice;
 
+    @BindView(R.id.readDBbutton)
+    Button readDBbutton;
+
+    @BindView(R.id.btnShowCharts)
+    Button btnShowCharts;
+
     @BindView(R.id.deviceState)
     TextView deviceStatus;
     @BindView(R.id.airQualityLevel)
@@ -105,6 +118,9 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     @BindView(R.id.serviceName)
     TextView serviceName;
 
+    @BindView(R.id.txtNrMeasurements)
+    TextView txtNrMeasurements;
+
     @BindView(R.id.progressBar)
     ProgressBar progressBar;
 
@@ -116,6 +132,9 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
     @BindView(R.id.arrowBtn)
     Button arrowBtn;
+
+    @BindView(R.id.spinnerChartInterval)
+    Spinner spinnerChartInterval;
 
     @BindView(R.id.cardView)
     CardView cardView;
@@ -249,6 +268,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
         mBluetoothAdapter = BluetoothUtils.getBluetoothAdapter(AirQualityActivity.this);
 
+        InitializeSpinner();
 
 
         if (mBluetoothAdapter == null || !mBluetoothAdapter.isEnabled()) {
@@ -259,6 +279,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         connectDevice.setEnabled(false);
         connectService.setEnabled(false);
         disconnectDevice.setEnabled(false);
+        btnShowCharts.setEnabled(false);
 
         //FIREBASE -- https://airqualityindex-d1fd2.firebaseio.com/
         databaseAQI = FirebaseDatabase.getInstance().getReference("measurements");
@@ -370,6 +391,44 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                             mBluetoothLEService.writeCharacteristic(mNotifyCharacteristic); // naming not
                         }
                     }
+                }
+            }
+        });
+
+        readDBbutton.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                databaseAQI.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        measurementsDB.clear();
+                            for(DataSnapshot measurementsSnapshot : dataSnapshot.getChildren()){
+                                Measurements meas = measurementsSnapshot.getValue(Measurements.class);
+                                measurementsDB.add(meas);
+                                txtNrMeasurements.setText("DB Size:" + String.valueOf(measurementsDB.size()));
+                            }
+                            btnShowCharts.setEnabled(true);
+                    }
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) {
+                            int a = 2;
+                    }
+                });
+            }
+        });
+
+        btnShowCharts.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                String intervalText = spinnerChartInterval.getSelectedItem().toString();
+                if(measurementsDB.size() > 0)
+                {
+                    int intervalSeconds = AqiUtils.GetSecondsFromSpinner(intervalText);
+                    int b = 0;
+                }
+                else
+                {
+                    Toast.makeText(getApplicationContext(),"No Measurements in DB!", Toast.LENGTH_SHORT).show();
                 }
             }
         });
@@ -761,5 +820,14 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         gauge_SO2.clearSections();
         gauge_SO2.addSections(sectionsAQI);
         gauge_SO2.speedTo(301);
+    }
+
+    public void InitializeSpinner()
+    {
+        ArrayAdapter<CharSequence> adapter = ArrayAdapter.createFromResource(this,
+                R.array.spinnerChartIntervalArray, android.R.layout.simple_spinner_item);
+        adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+        spinnerChartInterval.setAdapter(adapter);
+
     }
 }

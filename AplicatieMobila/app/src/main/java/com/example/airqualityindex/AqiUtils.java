@@ -71,4 +71,34 @@ public class AqiUtils {
 
     }
 
+    public static int GetSecondsFromSpinner(String input)
+    {
+        switch (input)
+        {
+            case "Last 5min":
+                return 300;
+            case "Last 10min":
+                return 600;
+            case "Last 30min":
+                return 1800;
+            case "Last 1h":
+                return 3600;
+            default:
+                return 3600;
+        }
+    }
+
+    /*
+    <item>Last 5min</item>
+        <item>Last 10min</item>
+        <item>Last 30min</item>
+        <item>Last 1h</item>
+        <item>Last 2h</item>
+        <item>Last 8h</item>
+        <item>Last 12h</item>
+        <item>Last 24h</item>
+        <item>Last 48h</item>
+        <item>Last 72h</item>
+     */
+
 }

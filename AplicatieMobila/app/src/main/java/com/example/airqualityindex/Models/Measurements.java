@@ -12,6 +12,11 @@ public class Measurements {
     public long date; // timestamp
     public String id;
 
+    public Measurements()
+    {
+
+    }
+
     public Measurements(long CO, long SO2, long NO2, long O3, long AQI, String place) {
         this.CO = CO;
         this.SO2 = SO2;
@@ -19,6 +24,6 @@ public class Measurements {
         this.O3 = O3;
         this.AQI = AQI;
         this.place = place;
-        this.date = System.currentTimeMillis();
+        this.date = System.currentTimeMillis() / 1000;
     }
 }
