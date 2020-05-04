@@ -8,6 +8,7 @@ import android.graphics.Color;
 import android.os.PersistableBundle;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
+import android.util.Pair;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
@@ -105,8 +106,18 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
     @BindView(R.id.deviceState)
     TextView deviceStatus;
-    @BindView(R.id.airQualityLevel)
-    TextView airQualityLevel;
+
+    @BindView(R.id.txtRawValueCO)
+    TextView txtRawValueCO;
+
+    @BindView(R.id.txtRawValueNO2)
+    TextView txtRawValueNO2;
+
+    @BindView(R.id.txtRawValueSO2)
+    TextView txtRawValueSO2;
+
+    @BindView(R.id.txtRawValueO3)
+    TextView txtRawValueO3;
 
     @BindView(R.id.batteryLevel)
     TextView batteryLevelText;
@@ -248,10 +259,11 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 }
                 else if(bleValues[0].equals("SensorValues"))
                 {
-                    airQualityLevel.setText(bleValues[1]);
-
+                    txtRawValueCO.setText(bleValues[1]);
+                    txtRawValueNO2.setText(bleValues[2]);
+                    txtRawValueSO2.setText(bleValues[3]);
+                    txtRawValueO3.setText(bleValues[4]);
                     PushValueAndGetAQI(bleValues);
-
                 }
             }
         }
@@ -603,7 +615,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     private void displayData(String data) {
         if (data != null) {
             if(!data.contains("%"))
-                airQualityLevel.setText(data);
+                txtRawValueCO.setText(data);
             else
                 batteryLevelText.setText(data);
         }
@@ -615,22 +627,33 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     private void PushValueAndGetAQI(String[] data)
     {
         long subIndexValue = 0;
-        long subIndexValue_CO = AqiUtils.GetSubIndexValue_CO(Double.parseDouble(data[1])); gauge_CO.speedTo(subIndexValue);
-        long subIndexValue_O3 = 0;
-        long subIndexValue_NO2 = 0;
-        long subIndexValue_SO2 = 0;
+        Pair<Long, Double> subIndexAndConcentration_CO = AqiUtils.GetSubIndexValue_CO(Double.parseDouble(data[1]));
+        gauge_CO.speedTo(subIndexAndConcentration_CO.first);
+        gauge_CO.setUnit(subIndexAndConcentration_CO.second +"ppm");
+
+        Pair<Long, Double> subIndexAndConcentration_NO2 = AqiUtils.GetSubIndexValue_NO2(Double.parseDouble(data[2]));
+        gauge_NO2.speedTo(subIndexAndConcentration_NO2.first);
+        gauge_NO2.setUnit(subIndexAndConcentration_NO2.second + "ppb");
+
+        Pair<Long, Double> subIndexAndConcentration_SO2 = AqiUtils.GetSubIndexValue_SO2(Double.parseDouble(data[3]));
+        gauge_SO2.speedTo(subIndexAndConcentration_SO2.first);
+        gauge_SO2.setUnit(subIndexAndConcentration_SO2.second + "ppb");
+
+        Pair<Long, Double> subIndexAndConcentration_O3 = AqiUtils.GetSubIndexValue_O3(Double.parseDouble(data[4]));
+        gauge_O3.speedTo(subIndexAndConcentration_O3.first);
+        gauge_O3.setUnit(subIndexAndConcentration_O3.second + "ppb");
+
+        //firs - SubIndexValue    second - concentration in ppb or ppm (CO)
+        long subIndexValue_CO = subIndexAndConcentration_CO.first;
+        long subIndexValue_NO2 = subIndexAndConcentration_NO2.first;
+        long subIndexValue_SO2 = subIndexAndConcentration_SO2.first;
+        long subIndexValue_O3 = subIndexAndConcentration_O3.first;
 
         if(subIndexValue_CO > subIndexValue_O3 && subIndexValue_CO > subIndexValue_NO2 && subIndexValue_CO > subIndexValue_SO2)
         {
             AQI_VALUE = subIndexValue_CO;
             gauge_AQI.speedTo(subIndexValue_CO);
             gauge_AQI.setUnit("CO"); // display the Main Pollutant
-        }
-        if(subIndexValue_O3 > subIndexValue_NO2 && subIndexValue_O3 > subIndexValue_CO && subIndexValue_O3 > subIndexValue_SO2)
-        {
-            AQI_VALUE = subIndexValue_O3;
-            gauge_AQI.speedTo(subIndexValue_O3);
-            gauge_AQI.setUnit("O3"); // display the Main Pollutant
         }
         if(subIndexValue_NO2 > subIndexValue_O3 && subIndexValue_NO2 > subIndexValue_NO2 && subIndexValue_NO2 > subIndexValue_CO)
         {
@@ -640,15 +663,21 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         }
         if(subIndexValue_SO2 > subIndexValue_O3 && subIndexValue_SO2 > subIndexValue_NO2 && subIndexValue_SO2 > subIndexValue_CO)
         {
-            AQI_VALUE = subIndexValue_NO2;
-            gauge_AQI.speedTo(subIndexValue_NO2);
-            gauge_AQI.setUnit("NO2"); // display the Main Pollutant
+            AQI_VALUE = subIndexValue_SO2;
+            gauge_AQI.speedTo(subIndexValue_SO2);
+            gauge_AQI.setUnit("SO2"); // display the Main Pollutant
+        }
+        if(subIndexValue_O3 > subIndexValue_NO2 && subIndexValue_O3 > subIndexValue_CO && subIndexValue_O3 > subIndexValue_SO2)
+        {
+            AQI_VALUE = subIndexValue_O3;
+            gauge_AQI.speedTo(subIndexValue_O3);
+            gauge_AQI.setUnit("O3"); // display the Main Pollutant
         }
 
         if(switchSaveDB.isChecked()) {
             Measurements measurement = new Measurements(subIndexValue_CO, subIndexValue_SO2, subIndexValue_NO2, subIndexValue_O3, AQI_VALUE, "HOME");
 
-            // Save to FIREBASE
+            // Save to FIREBASE DB
             AqiUtils.SaveMeasurementToDatabase(databaseAQI, measurement);
             Toast.makeText(this, "Measurement added", Toast.LENGTH_SHORT).show();
         }
@@ -690,7 +719,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                     //subIndexValue = AqiUtils.GetSubIndexValue_CO(Double.parseDouble(data[0]));
                     //subIndexValue = Math.round(Double.parseDouble(data[0]));
                     gauge_CO.speedTo(subIndexValue);
-                    airQualityLevel.setText(data[0]);
+                    txtRawValueCO.setText(data[0]);
                     break;
                 case "BATTERY":
                     batteryLevelText.setText(data[1] + "%");

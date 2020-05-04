@@ -180,34 +180,6 @@
 
     </LinearLayout>
 
-
-    <LinearLayout
-        android:orientation="horizontal"
-        android:layout_height="wrap_content"
-        android:layout_width="wrap_content"
-        android:layout_gravity="center_horizontal">
-
-        <TextView
-
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center"
-            android:text="Sensor Value: "
-            android:textSize="24sp"
-            android:layout_marginRight="23dp"
-            android:textColor="@color/colorPrimaryDark"/>
-
-        <TextView
-            android:id="@+id/airQualityLevel"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_gravity="center_horizontal"
-            android:text="0"
-            android:textColor="@color/colorPrimaryDark"
-            android:textSize="28sp" />
-    </LinearLayout>
-
-
     <ProgressBar
         android:id="@+id/progressBar"
         style="?android:attr/progressBarStyleHorizontal"
@@ -220,12 +192,109 @@
         android:layout_marginStart="8dp"
         android:indeterminate="true"
         android:visibility="invisible"
-        android:layout_gravity="center"
-        />
+        android:layout_gravity="center"/>
 
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center_horizontal">
 
+        <TextView
 
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Raw CO: "
+            android:textSize="24sp"
+            android:layout_marginRight="23dp"
+            android:textColor="@color/colorPrimaryDark"/>
 
+        <TextView
+            android:id="@+id/txtRawValueCO"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="0"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="28sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center_horizontal">
+
+        <TextView
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Raw NO2: "
+            android:textSize="24sp"
+            android:layout_marginRight="23dp"
+            android:textColor="@color/colorPrimaryDark"/>
+
+        <TextView
+            android:id="@+id/txtRawValueNO2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="0"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="28sp" />
+    </LinearLayout>
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_gravity="center_horizontal">
+
+        <TextView
+
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Raw SO2: "
+            android:textSize="24sp"
+            android:layout_marginRight="23dp"
+            android:textColor="@color/colorPrimaryDark"/>
+
+        <TextView
+            android:id="@+id/txtRawValueSO2"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="0"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="28sp" />
+    </LinearLayout>
+
+    <LinearLayout
+        android:orientation="horizontal"
+        android:layout_height="wrap_content"
+        android:layout_width="wrap_content"
+        android:layout_marginBottom="20dp"
+        android:layout_gravity="center_horizontal">
+
+        <TextView
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center"
+            android:text="Raw O3: "
+            android:textSize="24sp"
+            android:layout_marginRight="23dp"
+            android:textColor="@color/colorPrimaryDark"/>
+
+        <TextView
+            android:id="@+id/txtRawValueO3"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_gravity="center_horizontal"
+            android:text="0"
+            android:textColor="@color/colorPrimaryDark"
+            android:textSize="28sp" />
+    </LinearLayout>
 
 
 </LinearLayout>

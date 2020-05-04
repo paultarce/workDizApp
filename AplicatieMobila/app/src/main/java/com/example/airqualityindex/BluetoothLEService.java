@@ -236,8 +236,6 @@ public class BluetoothLEService extends Service {
                 intent.putExtra(EXTRA_DATA, sensorValues); // pot sa creez si alt string precum EXTRA_DATA ca sa trimit caracteristici dupa nume/UUID
                 sendBroadcast(intent);
             }
-
-
         }
         if(UUID_Battery_LEVEL.equals(characteristic.getUuid()))
         {

@@ -1,10 +1,13 @@
 package com.example.airqualityindex;
+import android.util.Pair;
 import android.widget.Toast;
 
 import com.example.airqualityindex.Models.Measurements;
 import com.google.firebase.database.DatabaseReference;
 
 import java.nio.ByteBuffer;
+import java.text.DecimalFormat;
+
 public class AqiUtils {
 
     //https://www3.epa.gov/airnow/aqi-technical-assistance-document-sept2018.pdf
@@ -17,11 +20,16 @@ public class AqiUtils {
      Very Unhealthy(201 - 300)    <=>  17.633 -    34.808
      Hazardous( 301 - 500 )       <=>  34.808 -    57.708
     */
-    public static long GetSubIndexValue_CO(double inputRawValue)// I Get ppb from sensor
+    public static Pair<Long,Double> GetSubIndexValue_CO(double inputRawValue)
     {
         double subIndexValue_double = 0;
         long subIndexValue = 0;
+        double sensitivity =  6.1; // 6.1 ppm,  0.00611 nA/ppb;
 
+        double measuredVoltage = GetVoltageFromQuanta(inputRawValue); // V
+
+        double nanoAmphereVal = ((measuredVoltage - 0.5) / 350000) * 1000000000;// (* 10 ^ 9)
+        double aqiValuePpm = nanoAmphereVal / sensitivity;
         /*if(inputRawValue < 5038)
             subIndexValue_double = 0.00992 * (inputRawValue - 0) + 0; //  (double)(50 - 0) / (5038 - 0))
         else if(inputRawValue < 10736)
@@ -34,24 +42,148 @@ public class AqiUtils {
             subIndexValue_double = ((300 - 201) / (34808 - 17634)) * (inputRawValue - 17634) + 201;
         else if(inputRawValue < 57708)
             subIndexValue_double = ((500 - 301) / (57708 - 34809)) * (inputRawValue - 34809) + 301;*/
-        inputRawValue = inputRawValue / 1000; // Transform to ppm - as the standard is for CO
-        if (inputRawValue <= 4.4)
-            subIndexValue_double = (50 / 4.4) * (inputRawValue - 0) + 0;
-        else if (inputRawValue <= 9.4)
-            subIndexValue_double = (49 / 4.9) * (inputRawValue - 4.5) + 51;
-        else if (inputRawValue <= 12.4)
-            subIndexValue_double = (49 / 2.9) * (inputRawValue - 9.5) + 101;
-        else if (inputRawValue <= 15.4)
-            subIndexValue_double = (49 / 2.9) * (inputRawValue - 12.5) + 151;
-        else if (inputRawValue <= 30.4)
-            subIndexValue_double = (99 / 14.9) * (inputRawValue - 15.5) + 201;
-        else if (inputRawValue <= 50.4)
-            subIndexValue_double = (199 / 19.9) * (inputRawValue - 30.5) + 301;
+        //inputRawValue = inputRawValue / 1000; // Transform to ppm - as the standard is for CO
+        if(aqiValuePpm <= 0)
+            subIndexValue_double = 0;
+        else if (aqiValuePpm <= 4.4)
+            subIndexValue_double = ((double)50 / 4.4) * (aqiValuePpm - 0) + 0;
+        else if (aqiValuePpm <= 9.4)
+            subIndexValue_double = ((double)49 / 4.9) * (aqiValuePpm - 4.5) + 51;
+        else if (aqiValuePpm <= 12.4)
+            subIndexValue_double = ((double)49 / 2.9) * (aqiValuePpm - 9.5) + 101;
+        else if (aqiValuePpm <= 15.4)
+            subIndexValue_double = ((double)49 / 2.9) * (aqiValuePpm - 12.5) + 151;
+        else if (aqiValuePpm <= 30.4)
+            subIndexValue_double = ((double)99 / 14.9) * (aqiValuePpm - 15.5) + 201;
+        else if (aqiValuePpm <= 50.4)
+            subIndexValue_double = ((double)199 / 19.9) * (aqiValuePpm - 30.5) + 301;
+        else
+            subIndexValue_double = 500;
 
         subIndexValue = Math.round(subIndexValue_double);
 
-        return subIndexValue;
+        return new Pair<Long,Double>(subIndexValue, Double.parseDouble(new DecimalFormat("#.##").format(aqiValuePpm)));
+    }
 
+    /* NO2 - dioxid de azot
+     GOOD( 0 - 50 )               <=>  0 - 53 ppb
+     MODERATE(51-100)             <=>  54 - 100 ppb
+     Unhealthy_sensitive(101-150) <=>  101 - 360
+     Unhealthy ( 151 - 200 )      <=>  361 - 649
+     Very Unhealthy(201 - 300)    <=>  650 - 1249
+     Hazardous( 301 - 500 )       <=>  1250 - 2049
+    */
+    public static Pair<Long,Double> GetSubIndexValue_NO2(double inputRawValue)
+    {
+        double subIndexValue_double = 0;
+        long subIndexValue = 0;
+        double sensitivity =  -0.01648; // 16.48 nA/ppm,  0.01648 nA/ppb;
+
+        double measuredVoltage = GetVoltageFromQuanta(inputRawValue); // => V
+
+        double nanoAmphereVal = ((1.675 - measuredVoltage) / 350000) * 1000000000;// (* 10 ^ 9)
+        double aqiValuePpb = nanoAmphereVal / sensitivity;
+
+        if(aqiValuePpb <= 0)
+            subIndexValue_double = 0;
+        else if (aqiValuePpb <= 53)
+            subIndexValue_double = ((double)50 / 53) * (aqiValuePpb - 0) + 0;
+        else if (aqiValuePpb <= 100)
+            subIndexValue_double = ((double)49 / 46) * (aqiValuePpb - 54) + 51;
+        else if (aqiValuePpb <= 360)
+            subIndexValue_double = ((double)49 / 259) * (aqiValuePpb - 101) + 101;
+        else if (aqiValuePpb <= 649)
+            subIndexValue_double = ((double)49 / 288) * (aqiValuePpb - 361) + 151;
+        else if (aqiValuePpb <= 1249)
+            subIndexValue_double = ((double)99 / 599) * (aqiValuePpb - 650) + 201;
+        else if (aqiValuePpb <= 2049)
+            subIndexValue_double = ((double)199 / 799) * (aqiValuePpb - 1250) + 301;
+        else
+            subIndexValue_double = 500;
+
+        subIndexValue = Math.round(subIndexValue_double);
+
+        return new Pair<Long,Double>(subIndexValue, Double.parseDouble(new DecimalFormat("#.##").format(aqiValuePpb)));    }
+
+    /* SO2 - Sulfur Dioxide
+     GOOD( 0 - 50 )               <=>  0 - 35 ppb
+     MODERATE(51-100)             <=>  36 - 75 ppb
+     Unhealthy_sensitive(101-150) <=>  76 - 185
+     Unhealthy ( 151 - 200 )      <=>  186 - 304
+     Very Unhealthy(201 - 300)    <=>  305 - 604
+     Hazardous( 301 - 500 )       <=>  605 - 1004
+    */
+    public static Pair<Long,Double> GetSubIndexValue_SO2(double inputRawValue)
+    {
+        double subIndexValue_double = 0;
+        long subIndexValue = 0;
+        double sensitivity =  0.03722; // 16.48 nA/ppm,  0.01648 nA/ppb;
+
+        double measuredVoltage = GetVoltageFromQuanta(inputRawValue); // => V
+
+        double nanoAmphereVal = ((measuredVoltage - 0.5) / 350000) * 1000000000;// (* 10 ^ 9)
+        double aqiValuePpb = nanoAmphereVal / sensitivity;
+
+        if(aqiValuePpb <= 0)
+            subIndexValue_double = 0;
+        else if (aqiValuePpb <= 35)
+            subIndexValue_double = ((double)50 / 35) * (aqiValuePpb - 0) + 0;
+        else if (aqiValuePpb <= 75)
+            subIndexValue_double = ((double)49 / 39) * (aqiValuePpb - 36) + 51;
+        else if (aqiValuePpb <= 185)
+            subIndexValue_double = ((double)49 / 109) * (aqiValuePpb - 76) + 101;
+        else if (aqiValuePpb <= 304)
+            subIndexValue_double = ((double)49 / 118) * (aqiValuePpb - 186) + 151;
+        else if (aqiValuePpb <= 604)
+            subIndexValue_double = ((double)99 / 299) * (aqiValuePpb - 305) + 201;
+        else if (aqiValuePpb <= 1004)
+            subIndexValue_double = ((double)199 / 399) * (aqiValuePpb - 605) + 301;
+        else
+            subIndexValue_double = 500;
+
+        subIndexValue = Math.round(subIndexValue_double);
+
+        return new Pair<Long,Double>(subIndexValue, Double.parseDouble(new DecimalFormat("#.##").format(aqiValuePpb)));    }
+
+    /* O3 - Sulfur Dioxide
+     GOOD( 0 - 50 )               <=>  0 - 54 ppb
+     MODERATE(51-100)             <=>  55 - 70 ppb
+     Unhealthy_sensitive(101-150) <=>  71 - 85
+     Unhealthy ( 151 - 200 )      <=>  86 - 105
+     Very Unhealthy(201 - 300)    <=>  106 - 200
+     Hazardous( 301 - 500 )       <=>  201 - 404
+    */
+    public static Pair<Long,Double> GetSubIndexValue_O3(double inputRawValue)
+    {
+        double subIndexValue_double = 0;
+        long subIndexValue = 0;
+        double sensitivity = -0.06773; // 16.48 nA/ppm,  0.01648 nA/ppb;
+
+        double measuredVoltage = GetVoltageFromQuanta(inputRawValue); // => V
+
+        double nanoAmphereVal = ((1.675 - measuredVoltage) / 350000) * 1000000000;// (* 10 ^ 9)
+        double aqiValuePpb = nanoAmphereVal / sensitivity;
+
+        if(aqiValuePpb <= 0)
+            subIndexValue_double = 0;
+        else if (aqiValuePpb <= 54)
+            subIndexValue_double = ((double)50 / 54) * (aqiValuePpb - 0) + 0;
+        else if (aqiValuePpb <= 70)
+            subIndexValue_double = ((double)49 / 15) * (aqiValuePpb - 55) + 51;
+        else if (aqiValuePpb <= 85)
+            subIndexValue_double = ((double)49 / 14) * (aqiValuePpb - 71) + 101;
+        else if (aqiValuePpb <= 105)
+            subIndexValue_double = ((double)49 / 19) * (aqiValuePpb - 86) + 151;
+        else if (aqiValuePpb <= 200)
+            subIndexValue_double = ((double)99 / 94) * (aqiValuePpb - 106) + 201;
+        else if (aqiValuePpb <= 404)
+            subIndexValue_double = ((double)199 / 203) * (aqiValuePpb - 201) + 301;
+        else
+            subIndexValue_double = 500;
+
+        subIndexValue = Math.round(subIndexValue_double);
+
+        return new Pair<Long,Double>(subIndexValue, Double.parseDouble(new DecimalFormat("#.##").format(aqiValuePpb)));
     }
 
     public static int GetIntFromByteArray(byte[] inputByteArray) {
@@ -59,16 +191,16 @@ public class AqiUtils {
         return wrapped.getInt(); // 1
     }
 
-
     public static void SaveMeasurementToDatabase(DatabaseReference databaseAQI, Measurements measurement)
     {
-
        String id = databaseAQI.push().getKey();
        measurement.id = id;
-
        databaseAQI.child(id).setValue(measurement);
+    }
 
-
+    private static double GetVoltageFromQuanta(double inputRawValue)
+    {
+        return (inputRawValue * 298) / 1000000000; // Output is the voltage in nanoVolts ( V )
     }
 
     public static int GetSecondsFromSpinner(String input)
