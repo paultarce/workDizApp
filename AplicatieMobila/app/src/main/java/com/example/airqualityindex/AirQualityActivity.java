@@ -70,6 +70,12 @@ import com.ekn.gruzer.gaugelibrary.Range;
 import com.example.airqualityindex.Models.Measurements;
 import com.github.anastr.speedviewlib.TubeSpeedometer;
 import com.github.anastr.speedviewlib.components.Section;
+import com.github.mikephil.charting.charts.LineChart;
+import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.data.Entry;
+import com.github.mikephil.charting.data.LineData;
+import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
@@ -81,6 +87,7 @@ import java.lang.Object;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActivity
 
@@ -192,6 +199,9 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     @BindView(R.id.gauge_SO2)
     TubeSpeedometer gauge_SO2;
 
+    @BindView(R.id.chartCO)
+    LineChart chartCO;
+
     private boolean mScanning;
 
     //This class provides methods to perform scan related operations for Bluetooth LE devices. An application can scan for a particular type of Bluetooth LE devices using ScanFilter.
@@ -220,7 +230,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     private BluetoothLEService mBluetoothLEService;
 
     private DatabaseReference  databaseAQI;
-    List<Measurements> measurementsDB;
+    ArrayList<Measurements> measurementsDB;
     Handler readHandler = new Handler();
 
     // Handles various events fired by the Service.
@@ -436,7 +446,16 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 if(measurementsDB.size() > 0)
                 {
                     int intervalSeconds = AqiUtils.GetSecondsFromSpinner(intervalText);
-                    int b = 0;
+
+                    ArrayList<Measurements> intervalMeasurements = AqiUtils.GetTimeRelatedMeasurement(measurementsDB, intervalSeconds);
+
+                    /*List<Long> CO_values = intervalMeasurements.stream().map(x -> x.CO).collect(Collectors.toList());
+                    List<Long> NO2_values = intervalMeasurements.stream().map(x -> x.NO2).collect(Collectors.toList());
+                    List<Long> SO2_values = intervalMeasurements.stream().map(x -> x.SO2).collect(Collectors.toList());
+                    List<Long> O3_values = intervalMeasurements.stream().map(x -> x.O3).collect(Collectors.toList());
+
+                    DrawLineChart_CO(CO_values, intervalSeconds );*/
+
                 }
                 else
                 {
@@ -857,6 +876,37 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 R.array.spinnerChartIntervalArray, android.R.layout.simple_spinner_item);
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         spinnerChartInterval.setAdapter(adapter);
+    }
+
+    public void DrawLineChart_CO(List<Long> CO_values, int seconds)
+    {
+        Description desc = new Description();
+        desc.setText("CO Chart");
+        chartCO.setDescription(desc);
+        ArrayList<Entry> yData = new ArrayList<>();
+        for(int i = 0; i < CO_values.size(); i++)
+        {
+            yData.add(new Entry(CO_values.get(i), i));
+        }
+
+        ArrayList<String> xData = new ArrayList<>();
+        for(int i = 1; i < 12; i++ ) // din 5 in 5 minute
+        {
+            xData.add(String.valueOf(5*i));
+        }
+
+        LineDataSet lineDataSet = new LineDataSet(yData, "CO Values");
+        lineDataSet.setColors(ColorTemplate.COLORFUL_COLORS);
+
+        LineData lineData = new LineData(lineDataSet);
+        /*lineData.
+        lineData.setValueTextSize(13f);
+        lineData.setValueTextSize(Color.BLACK);*/
+
+        chartCO.setData(lineData);
+        chartCO.invalidate();
+
+
 
     }
 }
