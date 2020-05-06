@@ -75,6 +75,7 @@ import com.github.mikephil.charting.components.Description;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
+import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.button.MaterialButton;
 import com.google.firebase.database.DataSnapshot;
@@ -84,6 +85,7 @@ import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
 import java.lang.Object;
+import java.lang.reflect.Array;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Set;
@@ -201,6 +203,10 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
     @BindView(R.id.chartCO)
     LineChart chartCO;
+    @BindView(R.id.chartSO2)
+    LineChart chartSO2;
+    @BindView(R.id.chartO3)
+    LineChart chartO3;
 
     private boolean mScanning;
 
@@ -449,13 +455,18 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
                     ArrayList<Measurements> intervalMeasurements = AqiUtils.GetTimeRelatedMeasurement(measurementsDB, intervalSeconds);
 
-                    /*List<Long> CO_values = intervalMeasurements.stream().map(x -> x.CO).collect(Collectors.toList());
-                    List<Long> NO2_values = intervalMeasurements.stream().map(x -> x.NO2).collect(Collectors.toList());
-                    List<Long> SO2_values = intervalMeasurements.stream().map(x -> x.SO2).collect(Collectors.toList());
-                    List<Long> O3_values = intervalMeasurements.stream().map(x -> x.O3).collect(Collectors.toList());
+                    List<Long> CO_values = new ArrayList<>();
+                    List<Long> NO2_values = new ArrayList<>();
+                    List<Long> SO2_values = new ArrayList<>();
+                    List<Long> O3_values = new ArrayList<>();
+                    for (Measurements measure : intervalMeasurements)
+                    {
+                        CO_values.add(measure.CO); NO2_values.add(measure.NO2); SO2_values.add(measure.SO2); O3_values.add(measure.O3);
+                    }
 
-                    DrawLineChart_CO(CO_values, intervalSeconds );*/
-
+                   // DrawLineChart_CO(CO_values, intervalSeconds );
+                    DrawLineChart_SO2(SO2_values, intervalSeconds);
+                    DrawLineChart_O3(O3_values, intervalSeconds);
                 }
                 else
                 {
@@ -880,33 +891,88 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
     public void DrawLineChart_CO(List<Long> CO_values, int seconds)
     {
+
         Description desc = new Description();
         desc.setText("CO Chart");
         chartCO.setDescription(desc);
+
+        //Y axis
         ArrayList<Entry> yData = new ArrayList<>();
         for(int i = 0; i < CO_values.size(); i++)
         {
-            yData.add(new Entry(CO_values.get(i), i));
+            yData.add(new Entry(i,CO_values.get(i)));
         }
+        LineDataSet lineDataSet1 = new LineDataSet(yData, "CO Values");
+        lineDataSet1.setColors(ColorTemplate.COLORFUL_COLORS);
 
+
+        //
+        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+        dataSets.add(lineDataSet1);
+
+        LineData data = new LineData(dataSets);
+        chartCO.setData(data);
+        chartCO.invalidate();
+
+        //X axis
         ArrayList<String> xData = new ArrayList<>();
         for(int i = 1; i < 12; i++ ) // din 5 in 5 minute
         {
             xData.add(String.valueOf(5*i));
         }
 
-        LineDataSet lineDataSet = new LineDataSet(yData, "CO Values");
-        lineDataSet.setColors(ColorTemplate.COLORFUL_COLORS);
-
-        LineData lineData = new LineData(lineDataSet);
-        /*lineData.
-        lineData.setValueTextSize(13f);
-        lineData.setValueTextSize(Color.BLACK);*/
-
-        chartCO.setData(lineData);
-        chartCO.invalidate();
-
-
 
     }
+
+    public void DrawLineChart_SO2(List<Long> SO_values, int seconds)
+    {
+        Description desc = new Description();
+        desc.setText("SO2 Chart");
+        chartSO2.setDescription(desc);
+
+        //Y axis
+        ArrayList<Entry> yData = new ArrayList<>();
+        for(int i = 0; i < SO_values.size(); i++)
+        {
+            yData.add(new Entry(i,SO_values.get(i)));
+        }
+        LineDataSet lineDataSet1 = new LineDataSet(yData, "SO2 Values");
+        lineDataSet1.setColors(ColorTemplate.COLORFUL_COLORS);
+
+
+        //
+        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+        dataSets.add(lineDataSet1);
+
+        LineData data = new LineData(dataSets);
+        chartSO2.setData(data);
+        chartSO2.invalidate();
+
+    }
+
+    public void DrawLineChart_O3(List<Long> O3_values, int seconds)
+    {
+        Description desc = new Description();
+        desc.setText("O3 Chart");
+        chartO3.setDescription(desc);
+
+        //Y axis
+        ArrayList<Entry> yData = new ArrayList<>();
+        for(int i = 0; i < O3_values.size(); i++)
+        {
+            yData.add(new Entry(i,O3_values.get(i)));
+        }
+        LineDataSet lineDataSet1 = new LineDataSet(yData, "O3 Values");
+        lineDataSet1.setColors(ColorTemplate.COLORFUL_COLORS);
+
+
+        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+        dataSets.add(lineDataSet1);
+
+        LineData data = new LineData(dataSets);
+        chartO3.setData(data);
+        chartO3.invalidate();
+    }
+
+
 }
