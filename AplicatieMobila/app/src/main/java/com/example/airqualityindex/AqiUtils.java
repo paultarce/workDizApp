@@ -213,8 +213,20 @@ public class AqiUtils {
                 return 1800;
             case "Last 1h":
                 return 3600;
+            case "Last 2h":
+                return 7200;
+            case "Last 4h":
+                return 14400;
+            case "Last 8h":
+                return 28800;
+            case "Last 12h":
+                return 43200;
+            case "Last 24h:":
+                return 86400;
             case "Last 48h":
                 return 172800;
+            case "Last 72h":
+                return 259200;
             default:
                 return 3600;
         }

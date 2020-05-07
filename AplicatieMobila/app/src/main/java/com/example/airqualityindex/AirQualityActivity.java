@@ -72,6 +72,8 @@ import com.github.anastr.speedviewlib.TubeSpeedometer;
 import com.github.anastr.speedviewlib.components.Section;
 import com.github.mikephil.charting.charts.LineChart;
 import com.github.mikephil.charting.components.Description;
+import com.github.mikephil.charting.components.XAxis;
+import com.github.mikephil.charting.components.YAxis;
 import com.github.mikephil.charting.data.Entry;
 import com.github.mikephil.charting.data.LineData;
 import com.github.mikephil.charting.data.LineDataSet;
@@ -207,6 +209,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     LineChart chartSO2;
     @BindView(R.id.chartO3)
     LineChart chartO3;
+    @BindView(R.id.chartNO2)
+    LineChart chartNO2;
 
     private boolean mScanning;
 
@@ -455,18 +459,31 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
                     ArrayList<Measurements> intervalMeasurements = AqiUtils.GetTimeRelatedMeasurement(measurementsDB, intervalSeconds);
 
-                    List<Long> CO_values = new ArrayList<>();
-                    List<Long> NO2_values = new ArrayList<>();
-                    List<Long> SO2_values = new ArrayList<>();
-                    List<Long> O3_values = new ArrayList<>();
-                    for (Measurements measure : intervalMeasurements)
-                    {
-                        CO_values.add(measure.CO); NO2_values.add(measure.NO2); SO2_values.add(measure.SO2); O3_values.add(measure.O3);
+                    if(intervalMeasurements.size() > 0 ) {
+                        List<Long> CO_values = new ArrayList<>();
+                        List<Long> NO2_values = new ArrayList<>();
+                        List<Long> SO2_values = new ArrayList<>();
+                        List<Long> timeAgo_SO2 = new ArrayList<>();
+                        List<Long> O3_values = new ArrayList<>();
+                        long initialTimeAgo = (System.currentTimeMillis() / 1000) - intervalMeasurements.get(0).date; // in seconds
+                        for (Measurements measure : intervalMeasurements) {
+                            CO_values.add(measure.CO);
+                            NO2_values.add(measure.NO2);
+                            SO2_values.add(measure.SO2);
+                            O3_values.add(measure.O3);
+                            timeAgo_SO2.add(initialTimeAgo);
+                            initialTimeAgo -= 20;
+                        }
+
+                        DrawLineChart_CO(CO_values, intervalSeconds);
+                        DrawLineChart_SO2(SO2_values, timeAgo_SO2);
+                        DrawLineChart_O3(O3_values, intervalSeconds);
+                        DrawLineChart_NO2(NO2_values, intervalSeconds);
+                    }
+                    else{
+                        Toast.makeText(getApplicationContext(),"No Data in this time slot!", Toast.LENGTH_SHORT).show();
                     }
 
-                   // DrawLineChart_CO(CO_values, intervalSeconds );
-                    DrawLineChart_SO2(SO2_values, intervalSeconds);
-                    DrawLineChart_O3(O3_values, intervalSeconds);
                 }
                 else
                 {
@@ -806,8 +823,6 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         }
     }
 
-
-
     private Runnable runnableCode = new Runnable() {
         @Override
         public void run() {
@@ -839,7 +854,6 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         sections.get(3).setColor(Color.RED);
         sections.get(4).setColor(Color.rgb(128,0,0));
         //gauge_AQI.addSections(sections);*/
-
 
         gauge_NO2.setMaxSpeed(500);
         gauge_NO2.setTrembleData(0,0);
@@ -891,7 +905,6 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
     public void DrawLineChart_CO(List<Long> CO_values, int seconds)
     {
-
         Description desc = new Description();
         desc.setText("CO Chart");
         chartCO.setDescription(desc);
@@ -904,7 +917,6 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         }
         LineDataSet lineDataSet1 = new LineDataSet(yData, "CO Values");
         lineDataSet1.setColors(ColorTemplate.COLORFUL_COLORS);
-
 
         //
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
@@ -920,11 +932,33 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         {
             xData.add(String.valueOf(5*i));
         }
-
-
     }
 
-    public void DrawLineChart_SO2(List<Long> SO_values, int seconds)
+    public void DrawLineChart_NO2(List<Long> NO_values, int seconds)
+    {
+        Description desc = new Description();
+        desc.setText("NO2 Chart");
+        chartNO2.setDescription(desc);
+
+        //Y axis
+        ArrayList<Entry> yData = new ArrayList<>();
+        for(int i = 0; i < NO_values.size(); i++)
+        {
+            yData.add(new Entry(i, NO_values.get(i)));
+        }
+        LineDataSet lineDataSet1 = new LineDataSet(yData, "NO2 Values");
+        lineDataSet1.setColors(ColorTemplate.COLORFUL_COLORS);
+
+        //
+        ArrayList<ILineDataSet> dataSets = new ArrayList<>();
+        dataSets.add(lineDataSet1);
+
+        LineData data = new LineData(dataSets);
+        chartNO2.setData(data);
+        chartNO2.invalidate();
+    }
+
+    public void DrawLineChart_SO2(List<Long> SO_values, List<Long> timeAgo_SO2)
     {
         Description desc = new Description();
         desc.setText("SO2 Chart");
@@ -934,19 +968,33 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         ArrayList<Entry> yData = new ArrayList<>();
         for(int i = 0; i < SO_values.size(); i++)
         {
-            yData.add(new Entry(i,SO_values.get(i)));
+            yData.add(new Entry(timeAgo_SO2.get(timeAgo_SO2.size() - 1 - i),SO_values.get(i)));
         }
+
+        XAxis xAx = chartSO2.getXAxis();
+        xAx.setAxisMaximum(timeAgo_SO2.get(0));
+        xAx.setAxisMinimum(timeAgo_SO2.get(timeAgo_SO2.size() -  1));
+
+        /*YAxis yAx = chartSO2.getAxisLeft();
+        YAxis yAxR = chartSO2.getAxisRight();
+        yAx.setAxisMinimum(0);
+        yAx.setAxisMaximum(300);
+
+        yAxR.setAxisMinimum(0);
+        yAxR.setAxisMaximum(300);*/
+
         LineDataSet lineDataSet1 = new LineDataSet(yData, "SO2 Values");
         lineDataSet1.setColors(ColorTemplate.COLORFUL_COLORS);
-
 
         //
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
         dataSets.add(lineDataSet1);
 
+
         LineData data = new LineData(dataSets);
         chartSO2.setData(data);
         chartSO2.invalidate();
+
 
     }
 
