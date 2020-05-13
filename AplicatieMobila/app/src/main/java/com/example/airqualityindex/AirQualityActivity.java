@@ -13,6 +13,7 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.View;
 import android.view.WindowManager;
+import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
 import android.widget.Button;
 import android.widget.LinearLayout;
@@ -135,8 +136,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
     @BindView(R.id.deviceAddress)
     TextView deviceAddress;
-    @BindView(R.id.deviceName)
-    TextView deviceName;
+    /*@BindView(R.id.deviceName)
+    TextView deviceName;*/
     @BindView(R.id.serviceName)
     TextView serviceName;
 
@@ -157,6 +158,9 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
     @BindView(R.id.spinnerChartInterval)
     Spinner spinnerChartInterval;
+
+    @BindView(R.id.spinnerBoundedDevices)
+    Spinner spinnerBoundedDevices;
 
     @BindView(R.id.cardView)
     CardView cardView;
@@ -238,6 +242,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     private boolean mConnected = false;
 
     private BluetoothLEService mBluetoothLEService;
+
+    Set<BluetoothDevice> pairedDevices;
 
     private DatabaseReference  databaseAQI;
     ArrayList<Measurements> measurementsDB;
@@ -350,17 +356,35 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         getPairedDevice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
-                Set<BluetoothDevice> pairedDevices = mBluetoothAdapter.getBondedDevices();
-                for(BluetoothDevice result: pairedDevices) {
+                pairedDevices = mBluetoothAdapter.getBondedDevices();
+                /*for(BluetoothDevice result: pairedDevices) {
                     if (result.getAddress().equals("00:A0:50:1A:D6:A3")) {
                         bluetoothDevice = result;
                         deviceAddress.setText(bluetoothDevice.getAddress());
-                        deviceName.setText(bluetoothDevice.getName());
+                       // deviceName.setText(bluetoothDevice.getName());
                         progressBar.setVisibility(View.INVISIBLE);
                         connectDevice.setEnabled(true);
                         return;
                     }
+                }*/
+                if(pairedDevices.size() > 0) {
+                    ArrayList<String> pairedDevicesNames = new ArrayList<>();
+                    for (BluetoothDevice device : pairedDevices) {
+                        pairedDevicesNames.add(device.getName());
+                    }
+                    ArrayAdapter<String> adapterBoundedDevices = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, pairedDevicesNames);
+                    adapterBoundedDevices.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                    spinnerBoundedDevices.setAdapter(adapterBoundedDevices);
+
+                    //set the first element as the device to connect to
+                    spinnerBoundedDevices.setSelection(0);
+                  /*  bluetoothDevice = pairedDevices.iterator().next();
+                    deviceAddress.setText(bluetoothDevice.getAddress());
+                    progressBar.setVisibility(View.INVISIBLE);
+                    connectDevice.setEnabled(true);*/
                 }
+                else
+                    Toast.makeText(getApplicationContext(), "No Paired Devices Available", Toast.LENGTH_SHORT ).show();
             }
         });
 
@@ -491,6 +515,30 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 }
             }
         });
+
+        spinnerBoundedDevices.setOnItemSelectedListener(new AdapterView.OnItemSelectedListener() {
+            @Override
+            public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
+                String deviceName = parent.getItemAtPosition(position).toString();
+                for(BluetoothDevice deviceBonded : pairedDevices)
+                {
+                    if(deviceBonded.getName().equals(deviceName))
+                    {
+                        bluetoothDevice = deviceBonded;
+                        deviceAddress.setText(bluetoothDevice.getAddress());
+                        // deviceName.setText(bluetoothDevice.getName());
+                        progressBar.setVisibility(View.INVISIBLE);
+                        connectDevice.setEnabled(true);
+                        return;
+                    }
+                }
+            }
+
+            @Override
+            public void onNothingSelected(AdapterView<?> parent) {
+
+            }
+        });
     }
 
     BluetoothGattCharacteristic specDataCharacteristic;
@@ -576,7 +624,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             super.onScanResult(callbackType, result);
             bluetoothDevice = result.getDevice();
             deviceAddress.setText(bluetoothDevice.getAddress());
-            deviceName.setText(bluetoothDevice.getName());
+           // deviceName.setText(bluetoothDevice.getName());
             progressBar.setVisibility(View.INVISIBLE);
             connectDevice.setEnabled(true);
         }
