@@ -41,6 +41,10 @@ public class BluetoothLEService extends Service {
     public final static UUID UUID_AirQuality_LEVEL =
             UUID.fromString(SampleGattAttributes.CHARACTERISTIC_SPEC_DATA_UUID);
 
+    public final static UUID UUID_BME_DATA = UUID.fromString(SampleGattAttributes.CHARACTERISTIC_BME_DATA_UUID);
+    public final static UUID UUID_PMS_DATA = UUID.fromString(SampleGattAttributes.CHARACTERISTIC_PMS_DATA_UUID);
+
+
     /*public final static UUID UUID_AirQuality_LEVEL =
             UUID.fromString(SampleGattAttributes.CHARACTERISTIC_SENSORS_DATA_UUID);*/
 
@@ -237,8 +241,30 @@ public class BluetoothLEService extends Service {
                 sendBroadcast(intent);
             }
         }
-        if(UUID_Battery_LEVEL.equals(characteristic.getUuid()))
+        if(UUID_BME_DATA.equals(characteristic.getUuid())) {
+            // 1- 2 ,  3 - 2,  5 - 4
+            byte[] receivedBytes = characteristic.getValue();
+            String[] sensorValues = new String[4];
+           // if (receivedBytes.length == 18) // get SPEC sensor values - in ppb
+
+            int TEMP_Value = AqiUtils.GetIntFromByteArray(new byte[]{0,0,receivedBytes[1],receivedBytes[2]});
+            int HUMID_Value = AqiUtils.GetIntFromByteArray(new byte[]{0,0, receivedBytes[3], receivedBytes[4]});
+            int PRESSURE_Value = AqiUtils.GetIntFromByteArray(new byte[]{receivedBytes[5], receivedBytes[6], receivedBytes[7], receivedBytes[8]});
+            //AqiUtils.GetIntFromByteArray(Arrays.copyOfRange(receivedBytes, 5, 8));
+            sensorValues[0] = "SensorValuesBME";
+            sensorValues[1] = String.valueOf(TEMP_Value);
+            sensorValues[2] = String.valueOf(HUMID_Value);
+            sensorValues[3] = String.valueOf(PRESSURE_Value);
+
+            //final int battery_level = characteristic.getIntValue(format, 0);
+            intent.putExtra(EXTRA_DATA, sensorValues); // pot sa creez si alt string precum EXTRA_DATA ca sa trimit caracteristici dupa nume/UUID
+            sendBroadcast(intent);
+        }
+        if (UUID_PMS_DATA.equals(characteristic.getUuid()))
         {
+
+        }
+        if (UUID_Battery_LEVEL.equals(characteristic.getUuid())) {
             int format = BluetoothGattCharacteristic.FORMAT_UINT8;
             //int value = characteristic.getValue()[2];
             final int battery_level = characteristic.getIntValue(format, 0);
@@ -249,7 +275,6 @@ public class BluetoothLEService extends Service {
             intent.putExtra(EXTRA_DATA, valueToSend_Battery);
             sendBroadcast(intent);
         }
-
     }
 
     @Nullable

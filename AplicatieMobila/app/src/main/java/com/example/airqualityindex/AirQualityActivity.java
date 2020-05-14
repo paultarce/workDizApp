@@ -131,6 +131,15 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     @BindView(R.id.txtRawValueO3)
     TextView txtRawValueO3;
 
+    @BindView(R.id.txtRawValueTemp)
+    TextView txtRawValueTemp;
+
+    @BindView(R.id.txtRawValueHumid)
+    TextView txtRawValueHumid;
+
+    @BindView(R.id.txtRawValuePressure)
+    TextView txtRawValuePressure;
+
     @BindView(R.id.batteryLevel)
     TextView batteryLevelText;
 
@@ -291,10 +300,17 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                     txtRawValueO3.setText(bleValues[4]);
                     PushValueAndGetAQI(bleValues);
                 }
+                else if(bleValues[0].equals("SensorValuesBME"))
+                {
+                    txtRawValueTemp.setText(bleValues[1]);
+                    txtRawValueHumid.setText(bleValues[2]);
+                    txtRawValuePressure.setText(bleValues[3]);
+                }
             }
         }
     };
 
+    int allCharReady = 0;
     @Override
     public void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -403,6 +419,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             @Override
             public void onClick(View v) {
                 readHandler.removeCallbacks(runnableCode);
+                allCharReady = 0;
                 mBluetoothLEService.disconnect();
             }
         });
@@ -421,24 +438,33 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 }
             }
         });*/
+
         connectService.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
 
                 Toast.makeText(AirQualityActivity.this, "Connecting to service...", Toast.LENGTH_LONG).show();
-
                 for (BluetoothGattCharacteristic mNotifyCharacteristic: mNotifyCharacteristics) {
 
                     if (mNotifyCharacteristic != null) {
                         final int charaProp = mNotifyCharacteristic.getProperties();
                         if ((charaProp & BluetoothGattCharacteristic.PROPERTY_READ) > 0) {
-                            mBluetoothLEService.readCharacteristic(mNotifyCharacteristic);
+                            //mBluetoothLEService.readCharacteristic(mNotifyCharacteristic);
                             //add setCharacteristicNotification here too ???
                             if(mNotifyCharacteristic.getUuid().toString().equals(SampleGattAttributes.CHARACTERISTIC_SPEC_DATA_UUID))
                             {
                                 specDataCharacteristic = mNotifyCharacteristic;
-                                readHandler.post(runnableCode);
+                                allCharReady ++;
+                                //readHandler.post(runnableCode);
                             }
+                            if(mNotifyCharacteristic.getUuid().toString().equals(SampleGattAttributes.CHARACTERISTIC_BME_DATA_UUID))
+                            {
+                                bmeDataCharacteristic = mNotifyCharacteristic;
+                                allCharReady ++;
+                                //readHandler.post(runnableCode);
+                            }
+                            if(allCharReady == 2)
+                                readHandler.post(runnableCode);
                         }
                         if ((charaProp & BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
                             mBluetoothLEService.setCharacteristicNotification(mNotifyCharacteristic, true);
@@ -542,6 +568,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     }
 
     BluetoothGattCharacteristic specDataCharacteristic;
+    BluetoothGattCharacteristic bmeDataCharacteristic;
 
     // Menu icons are inflated just as they were with actionbar
     @Override
@@ -699,6 +726,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 }
                 else{
                     readHandler.removeCallbacks(runnableCode);
+                    allCharReady = 0;
                     disconnectDevice.setEnabled(false);
                     connectDevice.setEnabled(true);
                     connectService.setEnabled(false);
@@ -875,6 +903,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         @Override
         public void run() {
             //do something here
+            mBluetoothLEService.readCharacteristic(bmeDataCharacteristic);
             mBluetoothLEService.readCharacteristic(specDataCharacteristic);
             readHandler.postDelayed(this, 20000);
         }
