@@ -8,7 +8,7 @@
     android:layout_height="match_parent"
     tools:showIn="@layout/activity_main"
     android:id="@+id/expandableView"
-    android:visibility="gone"
+    android:visibility="visible"
     >
 
     <View

@@ -253,6 +253,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     private BluetoothLEService mBluetoothLEService;
 
     Set<BluetoothDevice> pairedDevices;
+    ArrayList<BluetoothDevice> scannedDevices;
 
     private DatabaseReference  databaseAQI;
     ArrayList<Measurements> measurementsDB;
@@ -339,7 +340,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         databaseAQI = FirebaseDatabase.getInstance().getReference("measurements");
         //FirebaseDatabase.getInstance().getReference().child("measurements").child("CO").setValue("3.4");
         measurementsDB = new ArrayList<>();
-
+        scannedDevices = new ArrayList<>();
         InitializeGauges();
 
         arrowBtn.setOnClickListener(new View.OnClickListener() {
@@ -372,6 +373,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         getPairedDevice.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
+                scannedDevices.clear();
                 pairedDevices = mBluetoothAdapter.getBondedDevices();
                 /*for(BluetoothDevice result: pairedDevices) {
                     if (result.getAddress().equals("00:A0:50:1A:D6:A3")) {
@@ -546,16 +548,32 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             @Override
             public void onItemSelected(AdapterView<?> parent, View view, int position, long id) {
                 String deviceName = parent.getItemAtPosition(position).toString();
-                for(BluetoothDevice deviceBonded : pairedDevices)
+
+                if(scannedDevices.size() > 0)
                 {
-                    if(deviceBonded.getName().equals(deviceName))
+                    for(BluetoothDevice deviceBonded : scannedDevices)
                     {
-                        bluetoothDevice = deviceBonded;
-                        deviceAddress.setText(bluetoothDevice.getAddress());
-                        // deviceName.setText(bluetoothDevice.getName());
-                        progressBar.setVisibility(View.INVISIBLE);
-                        connectDevice.setEnabled(true);
-                        return;
+                        if(deviceBonded.getName().equals(deviceName))
+                        {
+                            bluetoothDevice = deviceBonded;
+                            deviceAddress.setText(bluetoothDevice.getAddress());
+                            // deviceName.setText(bluetoothDevice.getName());
+                            progressBar.setVisibility(View.INVISIBLE);
+                            connectDevice.setEnabled(true);
+                            return;
+                        }
+                    }
+                }
+                else {
+                    for (BluetoothDevice deviceBonded : pairedDevices) {
+                        if (deviceBonded.getName().equals(deviceName)) {
+                            bluetoothDevice = deviceBonded;
+                            deviceAddress.setText(bluetoothDevice.getAddress());
+                            // deviceName.setText(bluetoothDevice.getName());
+                            progressBar.setVisibility(View.INVISIBLE);
+                            connectDevice.setEnabled(true);
+                            return;
+                        }
                     }
                 }
             }
@@ -645,15 +663,17 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         }
     };
 
+
     private ScanCallback scanCallback = new ScanCallback() { // the result of the scanning
         @Override
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
             bluetoothDevice = result.getDevice();
-            deviceAddress.setText(bluetoothDevice.getAddress());
+            scannedDevices.add(bluetoothDevice);
+            //deviceAddress.setText(bluetoothDevice.getAddress());
            // deviceName.setText(bluetoothDevice.getName());
-            progressBar.setVisibility(View.INVISIBLE);
-            connectDevice.setEnabled(true);
+            //progressBar.setVisibility(View.INVISIBLE);
+            //connectDevice.setEnabled(true);
         }
 
         @Override
@@ -685,6 +705,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         //Set<BluetoothDevice> bondedDevices =  mBluetoothAdapter.getBondedDevices(); // asta ??
 
         Handler mHandler = new Handler();
+        scannedDevices.clear();
 
         if (enable) {
             List<ScanFilter> scanFilters = new ArrayList<>();
@@ -698,16 +719,33 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             mHandler.postDelayed(new Runnable() {
                 @Override
                 public void run() {
+                    //scanning finised
                     mScanning = false;
                     progressBar.setVisibility(View.INVISIBLE);
                     bluetoothLeScanner.stopScan(scanCallback);
+
+
+                    if(scannedDevices.size() > 0)
+                    {
+                        ArrayList<String> scannedDevicesNames = new ArrayList<>();
+                        for (BluetoothDevice device : scannedDevices) {
+                            scannedDevicesNames.add(device.getName());
+                        }
+                        ArrayAdapter<String> adapterBoundedDevices = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, scannedDevicesNames);
+                        adapterBoundedDevices.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
+                        spinnerBoundedDevices.setAdapter(adapterBoundedDevices);
+
+                        //set the first element as the device to connect to
+                        spinnerBoundedDevices.setSelection(0);
+                        connectDevice.setEnabled(true);
+                    }
                 }
 
             }, Constants.SCAN_PERIOD);
 
             mScanning = true;
-            bluetoothLeScanner.startScan(scanFilters, settings, scanCallback);
-           // bluetoothLeScanner.startScan(scanCallback);// mBluetoothAdapter.startLeScan(SampleGattAttributes.UUID_AIRQUALITY_SERVICE,);
+           // bluetoothLeScanner.startScan(scanFilters, settings, scanCallback);
+            bluetoothLeScanner.startScan(scanCallback);// mBluetoothAdapter.startLeScan(SampleGattAttributes.UUID_AIRQUALITY_SERVICE,);
         } else {
             mScanning = false;
             bluetoothLeScanner.stopScan(scanCallback);
@@ -904,6 +942,12 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         public void run() {
             //do something here
             mBluetoothLEService.readCharacteristic(bmeDataCharacteristic);
+            try {
+                Thread.sleep(1000);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+
             mBluetoothLEService.readCharacteristic(specDataCharacteristic);
             readHandler.postDelayed(this, 20000);
         }
