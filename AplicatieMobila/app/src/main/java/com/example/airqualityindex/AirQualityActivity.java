@@ -81,6 +81,7 @@ import com.github.mikephil.charting.data.LineDataSet;
 import com.github.mikephil.charting.interfaces.datasets.ILineDataSet;
 import com.github.mikephil.charting.utils.ColorTemplate;
 import com.google.android.material.button.MaterialButton;
+import com.google.android.material.textfield.TextInputLayout;
 import com.google.firebase.database.DataSnapshot;
 import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
@@ -115,6 +116,15 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
     @BindView(R.id.btnShowCharts)
     Button btnShowCharts;
+
+    @BindView(R.id.btnClearDB)
+    Button btnClearDB;
+
+    @BindView(R.id.btnSetSaveRate)
+    Button btnSetSaveRate;
+
+    @BindView(R.id.txtInputSaveDataRate)
+    TextInputLayout txtInputSaveDataRate;
 
     @BindView(R.id.deviceState)
     TextView deviceStatus;
@@ -258,7 +268,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     private DatabaseReference  databaseAQI;
     ArrayList<Measurements> measurementsDB;
     Handler readHandler = new Handler();
-
+    int saveToDbRate;
     // Handles various events fired by the Service.
     // ACTION_GATT_CONNECTED: connected to a GATT server.
     // ACTION_GATT_DISCONNECTED: disconnected from a GATT server.
@@ -342,6 +352,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         measurementsDB = new ArrayList<>();
         scannedDevices = new ArrayList<>();
         InitializeGauges();
+        saveToDbRate = 20;
 
         arrowBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -501,6 +512,14 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             }
         });
 
+        btnClearDB.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+               // DatabaseReference refMeasurements = FirebaseDatabase.getInstance(
+                databaseAQI.removeValue();
+            }
+        });
+
         btnShowCharts.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
@@ -541,6 +560,13 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 {
                     Toast.makeText(getApplicationContext(),"No Measurements in DB!", Toast.LENGTH_SHORT).show();
                 }
+            }
+        });
+
+        btnSetSaveRate.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                saveToDbRate = Integer.parseInt(txtInputSaveDataRate.getEditText().getText().toString());
             }
         });
 
@@ -669,7 +695,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         public void onScanResult(int callbackType, ScanResult result) {
             super.onScanResult(callbackType, result);
             bluetoothDevice = result.getDevice();
-            scannedDevices.add(bluetoothDevice);
+            if(!scannedDevices.contains(bluetoothDevice))
+                scannedDevices.add(bluetoothDevice);
             //deviceAddress.setText(bluetoothDevice.getAddress());
            // deviceName.setText(bluetoothDevice.getName());
             //progressBar.setVisibility(View.INVISIBLE);
@@ -836,8 +863,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         }
 
         if(switchSaveDB.isChecked()) {
-            Measurements measurement = new Measurements(subIndexValue_CO, subIndexValue_SO2, subIndexValue_NO2, subIndexValue_O3, AQI_VALUE, "HOME");
-
+            Measurements measurement = new Measurements(Long.parseLong(data[1]), Long.parseLong(data[3]), Long.parseLong(data[2]), Long.parseLong(data[4]),  subIndexValue_CO, subIndexValue_SO2, subIndexValue_NO2, subIndexValue_O3, AQI_VALUE, "HOME");
             // Save to FIREBASE DB
             AqiUtils.SaveMeasurementToDatabase(databaseAQI, measurement);
             Toast.makeText(this, "Measurement added", Toast.LENGTH_SHORT).show();
@@ -949,7 +975,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             }
 
             mBluetoothLEService.readCharacteristic(specDataCharacteristic);
-            readHandler.postDelayed(this, 20000);
+            readHandler.postDelayed(this, saveToDbRate * 1000);
         }
     };
 
