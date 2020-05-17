@@ -326,8 +326,5 @@ public class BluetoothLEService extends Service {
             return BluetoothLEService.this;
         }
     }
-
-
-
 }
 

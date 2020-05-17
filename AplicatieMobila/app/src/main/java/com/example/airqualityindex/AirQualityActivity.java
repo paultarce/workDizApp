@@ -316,6 +316,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                     txtRawValueTemp.setText(bleValues[1]);
                     txtRawValueHumid.setText(bleValues[2]);
                     txtRawValuePressure.setText(bleValues[3]);
+                    PushBmeValues(bleValues);
                 }
             }
         }
@@ -896,6 +897,11 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 gauge_AQI.setUnit(data[1]); // display the Main Pollutant
             }
         }*/
+    }
+
+    private void PushBmeValues(String[] data)
+    {
+
     }
     private void displayData(String[] data)
     {
