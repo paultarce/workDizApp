@@ -212,7 +212,7 @@
         android:layout_width="130dp"
         android:layout_height="wrap_content"
         app:hintAnimationEnabled="true"
-        android:hint="Saving data rate(sec)"
+        android:hint="Reading data rate(sec)"
         android:id="@+id/txtInputSaveDataRate"
         android:layout_gravity="center"
         >

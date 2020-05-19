@@ -3,6 +3,7 @@ import android.util.Pair;
 import android.widget.Toast;
 
 import com.example.airqualityindex.Models.Measurements;
+import com.example.airqualityindex.Models.MeasurementsBME;
 import com.google.firebase.database.DatabaseReference;
 
 import java.nio.ByteBuffer;
@@ -193,10 +194,15 @@ public class AqiUtils {
         return wrapped.getInt(); // 1
     }
 
-    public static void SaveMeasurementToDatabase(DatabaseReference databaseAQI, Measurements measurement) {
-        String id = databaseAQI.push().getKey();
+    public static void SaveMeasurementToDatabase(DatabaseReference databaseReference, Measurements measurement) {
+        String id = databaseReference.push().getKey();
         measurement.id = id;
-        databaseAQI.child(id).setValue(measurement);
+        databaseReference.child(id).setValue(measurement);
+    }
+    public static void SaveMeasurementBMEToDatabase(DatabaseReference databaseReference, MeasurementsBME measurement) {
+        String id = databaseReference.push().getKey();
+        measurement.id = id;
+        databaseReference.child(id).setValue(measurement);
     }
 
     private static double GetVoltageFromQuanta(double inputRawValue) {

@@ -5,6 +5,7 @@ import android.app.Activity;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.net.Uri;
 import android.os.PersistableBundle;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
@@ -63,12 +64,14 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.cardview.widget.CardView;
 import androidx.core.app.ActivityCompat;
 import androidx.core.content.ContextCompat;
+import androidx.core.content.FileProvider;
 
 //import com.github.aakira.expandablelayout.ExpandableLayout;
 
 import com.ekn.gruzer.gaugelibrary.HalfGauge;
 import com.ekn.gruzer.gaugelibrary.Range;
 import com.example.airqualityindex.Models.Measurements;
+import com.example.airqualityindex.Models.MeasurementsBME;
 import com.github.anastr.speedviewlib.TubeSpeedometer;
 import com.github.anastr.speedviewlib.components.Section;
 import com.github.mikephil.charting.charts.LineChart;
@@ -88,6 +91,8 @@ import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ValueEventListener;
 
+import java.io.File;
+import java.io.FileOutputStream;
 import java.lang.Object;
 import java.lang.reflect.Array;
 import java.util.ArrayList;
@@ -122,6 +127,9 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
     @BindView(R.id.btnSetSaveRate)
     Button btnSetSaveRate;
+
+    @BindView(R.id.btnExportData)
+    Button btnExportData;
 
     @BindView(R.id.txtInputSaveDataRate)
     TextInputLayout txtInputSaveDataRate;
@@ -266,7 +274,9 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     ArrayList<BluetoothDevice> scannedDevices;
 
     private DatabaseReference  databaseAQI;
-    ArrayList<Measurements> measurementsDB;
+    private DatabaseReference databaseBME;
+    ArrayList<Measurements> measurementsDBspec;
+    ArrayList<MeasurementsBME> measurementsDBbme;
     Handler readHandler = new Handler();
     int saveToDbRate;
     // Handles various events fired by the Service.
@@ -349,9 +359,12 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
         //FIREBASE -- https://airqualityindex-d1fd2.firebaseio.com/
         databaseAQI = FirebaseDatabase.getInstance().getReference("measurements");
+        databaseBME = FirebaseDatabase.getInstance().getReference("measurementsBme");
         //FirebaseDatabase.getInstance().getReference().child("measurements").child("CO").setValue("3.4");
-        measurementsDB = new ArrayList<>();
+        measurementsDBspec = new ArrayList<>();
+        measurementsDBbme = new ArrayList<>();
         scannedDevices = new ArrayList<>();
+
         InitializeGauges();
         saveToDbRate = 20;
 
@@ -497,18 +510,42 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 databaseAQI.addListenerForSingleValueEvent(new ValueEventListener() {
                     @Override
                     public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
-                        measurementsDB.clear();
-                            for(DataSnapshot measurementsSnapshot : dataSnapshot.getChildren()){
+                        if(dataSnapshot.getChildren() != null) {
+                            measurementsDBspec.clear();
+                            for (DataSnapshot measurementsSnapshot : dataSnapshot.getChildren()) {
                                 Measurements meas = measurementsSnapshot.getValue(Measurements.class);
-                                measurementsDB.add(meas);
-                                txtNrMeasurements.setText("DB Size:" + String.valueOf(measurementsDB.size()));
+                                measurementsDBspec.add(meas);
+                                txtNrMeasurements.setText("DB Size:" + String.valueOf(measurementsDBspec.size()));
                             }
                             btnShowCharts.setEnabled(true);
+                        }
+                        else
+                            Toast.makeText(getApplicationContext(),"SPEC Database is Null!", Toast.LENGTH_SHORT);
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
-                            int a = 2;
+
                     }
+                });
+
+                databaseBME.addListenerForSingleValueEvent(new ValueEventListener() {
+                    @Override
+                    public void onDataChange(@NonNull DataSnapshot dataSnapshot) {
+                        if(dataSnapshot.getChildren() != null) {
+                            measurementsDBbme.clear();
+                            for (DataSnapshot measurementsSnapshot : dataSnapshot.getChildren()) {
+                                MeasurementsBME measBME = measurementsSnapshot.getValue(MeasurementsBME.class);
+                                measurementsDBbme.add(measBME);
+                                //txtNrMeasurements.setText("DB Size:" + String.valueOf(measuermentsDBbme.size()));
+                            }
+                            //btnShowCharts.setEnabled(true);
+                        }
+                        else
+                            Toast.makeText(getApplicationContext(),"BME Database is Null!", Toast.LENGTH_SHORT);
+                    }
+
+                    @Override
+                    public void onCancelled(@NonNull DatabaseError databaseError) { }
                 });
             }
         });
@@ -518,6 +555,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             public void onClick(View v) {
                // DatabaseReference refMeasurements = FirebaseDatabase.getInstance(
                 databaseAQI.removeValue();
+                databaseBME.removeValue();
+                Toast.makeText(getApplicationContext(),"Database cleared!", Toast.LENGTH_SHORT).show();
             }
         });
 
@@ -525,11 +564,11 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             @Override
             public void onClick(View v) {
                 String intervalText = spinnerChartInterval.getSelectedItem().toString();
-                if(measurementsDB.size() > 0)
+                if(measurementsDBspec.size() > 0)
                 {
                     int intervalSeconds = AqiUtils.GetSecondsFromSpinner(intervalText);
 
-                    ArrayList<Measurements> intervalMeasurements = AqiUtils.GetTimeRelatedMeasurement(measurementsDB, intervalSeconds);
+                    ArrayList<Measurements> intervalMeasurements = AqiUtils.GetTimeRelatedMeasurement(measurementsDBspec, intervalSeconds);
 
                     if(intervalMeasurements.size() > 0 ) {
                         List<Long> CO_values = new ArrayList<>();
@@ -608,6 +647,13 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             @Override
             public void onNothingSelected(AdapterView<?> parent) {
 
+            }
+        });
+
+        btnExportData.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                ExportData();
             }
         });
     }
@@ -869,39 +915,18 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             AqiUtils.SaveMeasurementToDatabase(databaseAQI, measurement);
             Toast.makeText(this, "Measurement added", Toast.LENGTH_SHORT).show();
         }
-       /* if (data[0] != null && data[1] != null)
-        {
-            long subIndexValue = 0;
-            switch(data[0])
-            {
-                case "CO" :
-                    subIndexValue = AqiUtils.GetSubIndexValue_CO(Double.parseDouble(data[1]));
-                    //subIndexValue = Math.round(Double.parseDouble(data[0]));
-                    gauge_CO.speedTo(subIndexValue);
-                    break;
-                case "SO2":
-                    break;
-                case "NO2":
-                    break;
-                case "O3":
-                    break;
-                default:
-                    break;
-            }
-
-            if(subIndexValue > aqi_CO && subIndexValue > aqi_SO2 && subIndexValue > aqi_O3 && subIndexValue > aqi_PM25
-                    && subIndexValue > aqi_PM10 && subIndexValue > aqi_NO2 )
-            {
-                AQI_VALUE = subIndexValue;
-                gauge_AQI.speedTo(subIndexValue);
-                gauge_AQI.setUnit(data[1]); // display the Main Pollutant
-            }
-        }*/
     }
 
     private void PushBmeValues(String[] data)
     {
-
+        double temp = (double) Long.parseLong(data[1]) / 100;
+        double humid = (double) Long.parseLong(data[2]) / 100;
+        double press = (double) Long.parseLong(data[3]) / 100;
+        if(switchSaveDB.isChecked())
+        {
+            MeasurementsBME measurementsBME = new MeasurementsBME(Long.parseLong(data[1]), Long.parseLong(data[2]), Long.parseLong(data[3]), temp, humid, press, "HOME"  );
+            AqiUtils.SaveMeasurementBMEToDatabase(databaseBME, measurementsBME);
+        }
     }
     private void displayData(String[] data)
     {
@@ -1173,6 +1198,38 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         LineData data = new LineData(dataSets);
         chartO3.setData(data);
         chartO3.invalidate();
+    }
+
+    //https://www.youtube.com/watch?v=VDAwbgHoYEA
+    public void ExportData()
+    {
+        //generate data
+        StringBuilder data = new StringBuilder();
+        data.append("Time,Distance");
+        for(int i = 0; i<5; i++){
+            data.append("\n"+String.valueOf(i)+","+String.valueOf(i*i));
+        }
+
+        try{
+            //saving the file into device
+            FileOutputStream out = openFileOutput("data.csv", Context.MODE_PRIVATE);
+            out.write((data.toString()).getBytes());
+            out.close();
+
+            //exporting
+            Context context = getApplicationContext();
+            File filelocation = new File(getFilesDir(), "data.csv");
+            Uri path = FileProvider.getUriForFile(context, "com.example.airqualityindex.fileprovider", filelocation);
+            Intent fileIntent = new Intent(Intent.ACTION_SEND);
+            fileIntent.setType("text/csv");
+            fileIntent.putExtra(Intent.EXTRA_SUBJECT, "Data");
+            fileIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+            fileIntent.putExtra(Intent.EXTRA_STREAM, path);
+            startActivity(Intent.createChooser(fileIntent, "Send mail"));
+        }
+        catch(Exception e){
+            e.printStackTrace();
+        }
     }
 
 
