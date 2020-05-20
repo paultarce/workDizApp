@@ -7,6 +7,7 @@ import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.net.Uri;
 import android.os.PersistableBundle;
+import android.text.format.DateFormat;
 import android.transition.AutoTransition;
 import android.transition.TransitionManager;
 import android.util.Pair;
@@ -95,9 +96,13 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.Object;
 import java.lang.reflect.Array;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
+import java.util.TimeZone;
 import java.util.stream.Collectors;
 
 public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActivity
@@ -1168,12 +1173,9 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         ArrayList<ILineDataSet> dataSets = new ArrayList<>();
         dataSets.add(lineDataSet1);
 
-
         LineData data = new LineData(dataSets);
         chartSO2.setData(data);
         chartSO2.invalidate();
-
-
     }
 
     public void DrawLineChart_O3(List<Long> O3_values, int seconds)
@@ -1203,34 +1205,56 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     //https://www.youtube.com/watch?v=VDAwbgHoYEA
     public void ExportData()
     {
-        //generate data
-        StringBuilder data = new StringBuilder();
-        data.append("Time,Distance");
-        for(int i = 0; i<5; i++){
+        //read Data from  DB
+
+        if(measurementsDBspec.size() == 0 || measurementsDBbme.size() == 0 | measurementsDBbme.size() != measurementsDBspec.size())
+        {
+            Toast.makeText(getApplicationContext(),"No DB Data or BME size differs from SPEC size", Toast.LENGTH_SHORT).show();
+        }
+        else
+        {
+            //generate data
+            StringBuilder data = new StringBuilder();
+            data.append("Date,CO,NO2,SO2,O3,rawCO,rawNO2,rawSO2,rawO3,AQI,Temp,Humid,Press,Place");
+
+            for(int i = 0; i < measurementsDBspec.size(); i++)
+            {
+                Measurements ms = measurementsDBspec.get(i);
+                MeasurementsBME mb = measurementsDBbme.get(i);
+
+                Calendar cal = Calendar.getInstance(Locale.forLanguageTag("ro_RO"));
+                cal.setTimeInMillis(ms.date * 1000L);
+                String dateStr = DateFormat.format("dd-MM-yyyy hh:mm:ss", cal).toString();
+
+                data.append("\n" + dateStr +","+ms.CO+","+ms.NO2+","+ms.SO2+","+ms.O3+","+ms.rawCO+","+ms.rawNO2+","+ms.rawSO2+","+ms.rawO3+","+
+                        +ms.AQI+","+mb.Temp+","+mb.Humid+','+mb.Press+","+ms.place);
+            }
+
+            try{
+                Long timeStamp = System.currentTimeMillis() / 1000;
+                String fileName = "AqiData_" + String.valueOf(timeStamp) + ".csv";
+                //saving the file into device
+                FileOutputStream out = openFileOutput(fileName, Context.MODE_PRIVATE);
+                out.write((data.toString()).getBytes());
+                out.close();
+
+                //exporting
+                Context context = getApplicationContext();
+                File filelocation = new File(getFilesDir(), fileName);
+                Uri path = FileProvider.getUriForFile(context, "com.example.airqualityindex.fileprovider", filelocation);
+                Intent fileIntent = new Intent(Intent.ACTION_SEND);
+                fileIntent.setType("text/csv");
+                fileIntent.putExtra(Intent.EXTRA_SUBJECT, "Data");
+                fileIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
+                fileIntent.putExtra(Intent.EXTRA_STREAM, path);
+                startActivity(Intent.createChooser(fileIntent, "Send mail"));
+            }
+            catch(Exception e){
+                e.printStackTrace();
+            }
+        }
+        /*for(int i = 0; i<5; i++){
             data.append("\n"+String.valueOf(i)+","+String.valueOf(i*i));
-        }
-
-        try{
-            //saving the file into device
-            FileOutputStream out = openFileOutput("data.csv", Context.MODE_PRIVATE);
-            out.write((data.toString()).getBytes());
-            out.close();
-
-            //exporting
-            Context context = getApplicationContext();
-            File filelocation = new File(getFilesDir(), "data.csv");
-            Uri path = FileProvider.getUriForFile(context, "com.example.airqualityindex.fileprovider", filelocation);
-            Intent fileIntent = new Intent(Intent.ACTION_SEND);
-            fileIntent.setType("text/csv");
-            fileIntent.putExtra(Intent.EXTRA_SUBJECT, "Data");
-            fileIntent.addFlags(Intent.FLAG_GRANT_READ_URI_PERMISSION);
-            fileIntent.putExtra(Intent.EXTRA_STREAM, path);
-            startActivity(Intent.createChooser(fileIntent, "Send mail"));
-        }
-        catch(Exception e){
-            e.printStackTrace();
-        }
+        }*/
     }
-
-
 }

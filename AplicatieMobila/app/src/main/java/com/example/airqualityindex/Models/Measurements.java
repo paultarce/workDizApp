@@ -24,7 +24,7 @@ public class Measurements {
 
     public Measurements(long rawCO, long rawSO2, long rawNO2, long rawO3,long CO, long SO2, long NO2, long O3, long AQI, String place) {
         this.rawCO = rawCO;
-        this.rawNO2 = rawSO2;
+        this.rawNO2 = rawNO2;
         this.rawSO2 = rawSO2;
         this.rawO3 = rawO3;
         this.CO = CO;
