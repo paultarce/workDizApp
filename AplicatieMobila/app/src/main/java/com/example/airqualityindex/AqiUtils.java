@@ -250,8 +250,6 @@ public class AqiUtils {
         }
         return measurementsInPeriod;
     }
-
-
     /*
     <item>Last 5min</item>
         <item>Last 10min</item>

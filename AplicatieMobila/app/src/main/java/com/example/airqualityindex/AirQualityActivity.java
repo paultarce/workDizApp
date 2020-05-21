@@ -371,7 +371,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         scannedDevices = new ArrayList<>();
 
         InitializeGauges();
-        saveToDbRate = 20;
+        saveToDbRate = 60;
 
         arrowBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -418,7 +418,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 if(pairedDevices.size() > 0) {
                     ArrayList<String> pairedDevicesNames = new ArrayList<>();
                     for (BluetoothDevice device : pairedDevices) {
-                        pairedDevicesNames.add(device.getName());
+                        if(device.getName().contains("Airify"))
+                            pairedDevicesNames.add(device.getName());
                     }
                     ArrayAdapter<String> adapterBoundedDevices = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, pairedDevicesNames);
                     adapterBoundedDevices.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -808,7 +809,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                     {
                         ArrayList<String> scannedDevicesNames = new ArrayList<>();
                         for (BluetoothDevice device : scannedDevices) {
-                            scannedDevicesNames.add(device.getName());
+                            if(device.getName().contains("Airify"))
+                                scannedDevicesNames.add(device.getName());
                         }
                         ArrayAdapter<String> adapterBoundedDevices = new ArrayAdapter<String>(getApplicationContext(), android.R.layout.simple_spinner_item, scannedDevicesNames);
                         adapterBoundedDevices.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
@@ -952,7 +954,6 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             }
         }
     }
-
 
     private void displayGattServices(List<BluetoothGattService> gattServices) {
         if (gattServices == null)
@@ -1215,7 +1216,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         {
             //generate data
             StringBuilder data = new StringBuilder();
-            data.append("Date,CO,NO2,SO2,O3,rawCO,rawNO2,rawSO2,rawO3,AQI,Temp,Humid,Press,Place");
+            data.append("Device,Date,CO,NO2,SO2,O3,rawCO,rawNO2,rawSO2,rawO3,AQI,Temp,Humid,Press,Place");
 
             for(int i = 0; i < measurementsDBspec.size(); i++)
             {
@@ -1226,8 +1227,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 cal.setTimeInMillis(ms.date * 1000L);
                 String dateStr = DateFormat.format("dd-MM-yyyy hh:mm:ss", cal).toString();
 
-                data.append("\n" + dateStr +","+ms.CO+","+ms.NO2+","+ms.SO2+","+ms.O3+","+ms.rawCO+","+ms.rawNO2+","+ms.rawSO2+","+ms.rawO3+","+
-                        +ms.AQI+","+mb.Temp+","+mb.Humid+','+mb.Press+","+ms.place);
+                data.append("\n"+ bluetoothDevice.getAddress()+" - "+bluetoothDevice.getName()+"," + dateStr +","+ms.CO+","+ms.NO2+","+
+                        ms.SO2+","+ms.O3+","+ms.rawCO+","+ms.rawNO2+","+ms.rawSO2+","+ms.rawO3+","+ +ms.AQI+","+mb.Temp+","+mb.Humid+','+mb.Press+","+ms.place);
             }
 
             try{
@@ -1253,8 +1254,5 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 e.printStackTrace();
             }
         }
-        /*for(int i = 0; i<5; i++){
-            data.append("\n"+String.valueOf(i)+","+String.valueOf(i*i));
-        }*/
     }
 }
