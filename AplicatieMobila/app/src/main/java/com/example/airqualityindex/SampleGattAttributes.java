@@ -44,8 +44,8 @@ public class SampleGattAttributes {
         //attributes.put(CHARACTERISTIC_PMS_DATA_UUID, "PMS_DATA");
         //attributes.put(CHARACTERISTIC_SPEC_DATA_UUID, "SPEC_DATA");
 
-        /*attributes.put(UUID_BATTERY_LEVEL_UUID, "Battery level");
-        attributes.put(UUID_BATTERY_SERVICE, "Battery Service");*/
+        attributes.put(UUID_BATTERY_LEVEL_UUID, "Battery level");
+        attributes.put(UUID_BATTERY_SERVICE, "Battery Service");
      //   attributes.put(UUID_BATTERY_LEVEL_UUID, "Battery level");
 
     }

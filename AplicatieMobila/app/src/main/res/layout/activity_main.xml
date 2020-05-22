@@ -429,7 +429,7 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="PM2.5"
+                android:text="TEMP"
                 android:gravity="center"
                 android:textStyle="bold"
                 android:textColor="@color/colorPrimaryDark"
@@ -444,7 +444,7 @@
                 app:sv_speedTextPosition="TOP_CENTER"
                 app:sv_speedTextSize="26dp"
                 app:sv_speedometerWidth="10dp"
-                app:sv_unit="ppb"
+                app:sv_unit="C"
                 app:sv_unitTextSize="10dp"
                 app:sv_unitUnderSpeedText="true"
                 app:sv_textSize="7dp"
@@ -455,29 +455,30 @@
             <TextView
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:text="PM10"
+                android:text="HUMID"
                 android:gravity="center"
                 android:textStyle="bold"
                 android:layout_marginTop="5dp"
                 android:textColor="@color/colorPrimaryDark"
                 />
+
             <com.github.anastr.speedviewlib.TubeSpeedometer
                 android:id="@+id/gauge_PM10"
                 android:layout_width="72dp"
-                android:layout_height="72dp"
+                android:layout_height="81dp"
                 android:layout_below="@+id/halfGauge"
                 android:layout_gravity="center"
+                app:sv_speedTextColor="@color/colorPrimaryDark"
                 app:sv_speedTextFormat="INTEGER"
                 app:sv_speedTextPosition="TOP_CENTER"
                 app:sv_speedTextSize="26dp"
+                app:sv_speedometerBackColor="@color/cardview_shadow_start_color"
                 app:sv_speedometerWidth="10dp"
-                app:sv_unit="ppb"
-                app:sv_unitTextSize="10dp"
-                app:sv_unitUnderSpeedText="true"
                 app:sv_textSize="7dp"
-                app:sv_speedTextColor="@color/colorPrimaryDark"
+                app:sv_unit="%"
                 app:sv_unitTextColor="@color/colorPrimaryDark"
-                app:sv_speedometerBackColor="@color/cardview_shadow_start_color"/>
+                app:sv_unitTextSize="10dp"
+                app:sv_unitUnderSpeedText="true" />
 
             <TextView
                 android:layout_width="match_parent"

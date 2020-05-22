@@ -96,6 +96,7 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.lang.Object;
 import java.lang.reflect.Array;
+import java.text.DecimalFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Calendar;
@@ -316,7 +317,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 //displayData(intent.getStringExtra(BluetoothLEService.EXTRA_DATA));
                 if(bleValues[0].equals("BATTERY"))
                 {
-                    displayData(bleValues);
+                    //displayData(bleValues);
+                    batteryLevelText.setText(bleValues[1]  + "%");
                 }
                 else if(bleValues[0].equals("SensorValues"))
                 {
@@ -371,7 +373,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         scannedDevices = new ArrayList<>();
 
         InitializeGauges();
-        saveToDbRate = 60;
+        saveToDbRate = 20;
 
         arrowBtn.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -496,7 +498,13 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                                 allCharReady ++;
                                 //readHandler.post(runnableCode);
                             }
-                            if(allCharReady == 2)
+                            if(mNotifyCharacteristic.getUuid().toString().equals(SampleGattAttributes.UUID_BATTERY_LEVEL_UUID))
+                            {
+                                batteryLevelCharacteristic = mNotifyCharacteristic;
+                                allCharReady ++;
+                                //readHandler.post(runnableCode);
+                            }
+                            if(allCharReady == 3)
                                 readHandler.post(runnableCode);
                         }
                         if ((charaProp & BluetoothGattCharacteristic.PROPERTY_NOTIFY) > 0) {
@@ -527,6 +535,9 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                         }
                         else
                             Toast.makeText(getApplicationContext(),"SPEC Database is Null!", Toast.LENGTH_SHORT);
+
+                        if(measurementsDBspec.size() == 0)
+                            txtNrMeasurements.setText("DB Size:" + 0);
                     }
                     @Override
                     public void onCancelled(@NonNull DatabaseError databaseError) {
@@ -666,6 +677,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
     BluetoothGattCharacteristic specDataCharacteristic;
     BluetoothGattCharacteristic bmeDataCharacteristic;
+    BluetoothGattCharacteristic batteryLevelCharacteristic;
+
 
     // Menu icons are inflated just as they were with actionbar
     @Override
@@ -917,7 +930,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         }
 
         if(switchSaveDB.isChecked()) {
-            Measurements measurement = new Measurements(Long.parseLong(data[1]), Long.parseLong(data[3]), Long.parseLong(data[2]), Long.parseLong(data[4]),  subIndexValue_CO, subIndexValue_SO2, subIndexValue_NO2, subIndexValue_O3, AQI_VALUE, "HOME");
+            Measurements measurement = new Measurements(Long.parseLong(data[1]), Long.parseLong(data[3]), Long.parseLong(data[2]), Long.parseLong(data[4]),  subIndexValue_CO, subIndexValue_SO2, subIndexValue_NO2, subIndexValue_O3, AQI_VALUE, "HOME", bluetoothDevice.getAddress()+" - "+bluetoothDevice.getName());
             // Save to FIREBASE DB
             AqiUtils.SaveMeasurementToDatabase(databaseAQI, measurement);
             Toast.makeText(this, "Measurement added", Toast.LENGTH_SHORT).show();
@@ -926,12 +939,38 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
 
     private void PushBmeValues(String[] data)
     {
-        double temp = (double) Long.parseLong(data[1]) / 100;
-        double humid = (double) Long.parseLong(data[2]) / 100;
-        double press = (double) Long.parseLong(data[3]) / 100;
+       // float temp = ( Float.parseFloat(data[1]) / 100 );
+       // float humid =  Float.parseFloat(data[2]) / 100;
+       // float press = Float.parseFloat(data[3]) / 100;
+
+        float temp = Float.parseFloat(new DecimalFormat("#.##").format(Float.parseFloat(data[1]) / 100));
+        float humid = Float.parseFloat(new DecimalFormat("#.##").format(Float.parseFloat(data[2]) / 100));
+        float press = Float.parseFloat(new DecimalFormat("#.##").format(Float.parseFloat(data[3]) / 100));
+
+        if(temp > - 40 && temp < 100) {
+            gauge_PM25.speedTo(temp);
+            gauge_PM25.setUnit(temp + "C");
+        }
+        else {
+            gauge_PM25.speedTo(0);
+            gauge_PM25.setUnit(temp + "C");
+        }
+       // gauge_PM25.setUnit(Double.parseDouble(new DecimalFormat("#.#").format(temp)) + " C");
+
+        if(humid >= 0 && humid <= 100) {
+            gauge_PM10.speedTo(humid);
+            gauge_PM10.setUnit(humid + "%");
+        }
+        else {
+            gauge_PM10.speedTo(0);
+            gauge_PM10.setUnit(humid + "%");
+        }
+       // gauge_PM10.setUnit(Double.parseDouble(new DecimalFormat("#.#").format(humid)) + " %");
+        //gauge_PM10.speed
+
         if(switchSaveDB.isChecked())
         {
-            MeasurementsBME measurementsBME = new MeasurementsBME(Long.parseLong(data[1]), Long.parseLong(data[2]), Long.parseLong(data[3]), temp, humid, press, "HOME"  );
+            MeasurementsBME measurementsBME = new MeasurementsBME(Long.parseLong(data[1]), Long.parseLong(data[2]), Long.parseLong(data[3]), temp, humid, press, "HOME",bluetoothDevice.getAddress()+" - "+bluetoothDevice.getName());
             AqiUtils.SaveMeasurementBMEToDatabase(databaseBME, measurementsBME);
         }
     }
@@ -992,7 +1031,6 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                         connectService.setEnabled(true);
                         //break;
                     }
-
                 }
                 //mNotifyCharacteristic = gattCharacteristicFound;
                // return;
@@ -1006,12 +1044,19 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             //do something here
             mBluetoothLEService.readCharacteristic(bmeDataCharacteristic);
             try {
-                Thread.sleep(1000);
+                Thread.sleep(500);
             } catch (InterruptedException e) {
                 e.printStackTrace();
             }
 
             mBluetoothLEService.readCharacteristic(specDataCharacteristic);
+            try {
+                Thread.sleep(500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            mBluetoothLEService.readCharacteristic(batteryLevelCharacteristic);
+
             readHandler.postDelayed(this, saveToDbRate * 1000);
         }
     };
@@ -1030,7 +1075,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         gauge_AQI.setTrembleData(0,0);
         gauge_AQI.clearSections();
         gauge_AQI.addSections(sectionsAQI);
-        gauge_AQI.speedTo(120);
+        gauge_AQI.speedTo(0);
         /*List<Section> sections = gauge_AQI.getSections();
         sections.get(0).setColor(Color.GREEN);
         sections.get(1).setColor(Color.YELLOW);
@@ -1043,40 +1088,40 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         gauge_NO2.setTrembleData(0,0);
         gauge_NO2.clearSections();
         gauge_NO2.addSections(sectionsAQI);
-        gauge_NO2.speedTo(49);
+        gauge_NO2.speedTo(0);
 
 
         gauge_PM10.setMaxSpeed(500);
         gauge_PM10.setTrembleData(0,0);
         gauge_PM10.clearSections();
         gauge_PM10.addSections(sectionsAQI);
-        gauge_PM10.speedTo(75);
+        gauge_PM10.speedTo(0);
 
 
         gauge_PM25.setMaxSpeed(500);
         gauge_PM25.setTrembleData(0,0);
         gauge_PM25.clearSections();
         gauge_PM25.addSections(sectionsAQI);
-        gauge_PM25.speedTo(101);
+        gauge_PM25.speedTo(0);
 
         gauge_CO.setMaxSpeed(500);
         gauge_CO.setTrembleData(0,0);
         gauge_CO.clearSections();
         gauge_CO.addSections(sectionsAQI);
-        gauge_CO.speedTo(151);
+        gauge_CO.speedTo(0);
 
 
         gauge_O3.setMaxSpeed(500);
         gauge_O3.setTrembleData(0,0);
         gauge_O3.clearSections();
         gauge_O3.addSections(sectionsAQI);
-        gauge_O3.speedTo(201);
+        gauge_O3.speedTo(0);
 
         gauge_SO2.setMaxSpeed(500);
         gauge_SO2.setTrembleData(0,0);
         gauge_SO2.clearSections();
         gauge_SO2.addSections(sectionsAQI);
-        gauge_SO2.speedTo(301);
+        gauge_SO2.speedTo(0);
     }
 
     public void InitializeSpinner()
@@ -1227,8 +1272,8 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                 cal.setTimeInMillis(ms.date * 1000L);
                 String dateStr = DateFormat.format("dd-MM-yyyy hh:mm:ss", cal).toString();
 
-                data.append("\n"+ bluetoothDevice.getAddress()+" - "+bluetoothDevice.getName()+"," + dateStr +","+ms.CO+","+ms.NO2+","+
-                        ms.SO2+","+ms.O3+","+ms.rawCO+","+ms.rawNO2+","+ms.rawSO2+","+ms.rawO3+","+ +ms.AQI+","+mb.Temp+","+mb.Humid+','+mb.Press+","+ms.place);
+                data.append("\n" + ms.device + "," + dateStr +","+ms.CO+","+ms.NO2+","+ ms.SO2+","+ms.O3+","+ms.rawCO+","+ms.rawNO2+","+ms.rawSO2+","
+                        +ms.rawO3+","+ +ms.AQI+","+mb.Temp+","+mb.Humid+','+mb.Press+","+ms.place);
             }
 
             try{

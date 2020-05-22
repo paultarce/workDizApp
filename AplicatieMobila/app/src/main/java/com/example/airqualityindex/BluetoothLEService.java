@@ -231,7 +231,7 @@ public class BluetoothLEService extends Service {
         }
         if (UUID_PMS_DATA.equals(characteristic.getUuid()))
         {
-
+            //TO DO - no data available currently
         }
         if (UUID_Battery_LEVEL.equals(characteristic.getUuid())) {
             int format = BluetoothGattCharacteristic.FORMAT_UINT8;

@@ -16,13 +16,14 @@ public class Measurements {
     public String place;
     public long date; // timestamp
     public String id;
+    public String device;
 
     public Measurements()
     {
 
     }
 
-    public Measurements(long rawCO, long rawSO2, long rawNO2, long rawO3,long CO, long SO2, long NO2, long O3, long AQI, String place) {
+    public Measurements(long rawCO, long rawSO2, long rawNO2, long rawO3,long CO, long SO2, long NO2, long O3, long AQI, String place, String device) {
         this.rawCO = rawCO;
         this.rawNO2 = rawNO2;
         this.rawSO2 = rawSO2;
@@ -33,6 +34,7 @@ public class Measurements {
         this.O3 = O3;
         this.AQI = AQI;
         this.place = place;
+        this.device = device;
         this.date = System.currentTimeMillis() / 1000;
     }
 }
