@@ -79,7 +79,7 @@ public class AqiUtils {
     public static Pair<Long, Double> GetSubIndexValue_NO2(double inputRawValue) {
         double subIndexValue_double = 0;
         long subIndexValue = 0;
-        double sensitivity = -0.01648; // 16.48 nA/ppm,  0.01648 nA/ppb;
+        double sensitivity = 0.01648; // 16.48 nA/ppm,  0.01648 nA/ppb;
 
         double measuredVoltage = GetVoltageFromQuanta(inputRawValue); // => V
 
@@ -160,7 +160,7 @@ public class AqiUtils {
     public static Pair<Long, Double> GetSubIndexValue_O3(double inputRawValue) {
         double subIndexValue_double = 0;
         long subIndexValue = 0;
-        double sensitivity = -0.06773; // 16.48 nA/ppm,  0.01648 nA/ppb;
+        double sensitivity = 0.06773; // 16.48 nA/ppm,  0.01648 nA/ppb;
 
         double measuredVoltage = GetVoltageFromQuanta(inputRawValue); // => V
 
