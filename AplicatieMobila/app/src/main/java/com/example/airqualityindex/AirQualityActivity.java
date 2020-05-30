@@ -373,7 +373,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
         scannedDevices = new ArrayList<>();
 
         InitializeGauges();
-        saveToDbRate = 20;
+        saveToDbRate = 60;
 
         arrowBtn.setOnClickListener(new View.OnClickListener() {
             @Override

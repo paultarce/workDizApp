@@ -84,7 +84,7 @@ public class AqiUtils {
         double measuredVoltage = GetVoltageFromQuanta(inputRawValue); // => V
 
         //double voltage = 1.675 - measuredVoltage
-        double nanoAmphereVal = ((1.675 - measuredVoltage) / 350000) * 1000000000;// (* 10 ^ 9) // ar trebui sa fie mai mic decat 1.675
+        double nanoAmphereVal = ((1.6775 - measuredVoltage) / 350000) * 1000000000;// (* 10 ^ 9) // ar trebui sa fie mai mic decat 1.675
         double aqiValuePpb = nanoAmphereVal / sensitivity;
 
         if (aqiValuePpb <= 0)
@@ -164,7 +164,7 @@ public class AqiUtils {
 
         double measuredVoltage = GetVoltageFromQuanta(inputRawValue); // => V
 
-        double nanoAmphereVal = ((1.675 - measuredVoltage) / 350000) * 1000000000;// (* 10 ^ 9)
+        double nanoAmphereVal = ((1.6775 - measuredVoltage) / 350000) * 1000000000;// (* 10 ^ 9)
         double aqiValuePpb = nanoAmphereVal / sensitivity;
 
         if (aqiValuePpb <= 0)
