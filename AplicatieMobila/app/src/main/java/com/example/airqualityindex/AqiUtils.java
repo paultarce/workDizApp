@@ -24,10 +24,15 @@ public class AqiUtils {
      Very Unhealthy(201 - 300)    <=>  17.633 -    34.808
      Hazardous( 301 - 500 )       <=>  34.808 -    57.708
     */
-    public static Pair<Long, Double> GetSubIndexValue_CO(double inputRawValue) {
+    public static Pair<Long, Double> GetSubIndexValue_CO(double inputRawValue,String FwVersion) {
         double subIndexValue_double = 0;
         long subIndexValue = 0;
         double sensitivity = 6.1; // 6.1 ppm,  0.00611 nA/ppb;
+
+        if(FwVersion.equals("AirifyW4"))
+            sensitivity = 6.11;
+        else
+            sensitivity = 4.02;
 
         double measuredVoltage = GetVoltageFromQuanta(inputRawValue); // V
 
@@ -76,10 +81,15 @@ public class AqiUtils {
      Very Unhealthy(201 - 300)    <=>  650 - 1249
      Hazardous( 301 - 500 )       <=>  1250 - 2049
     */
-    public static Pair<Long, Double> GetSubIndexValue_NO2(double inputRawValue) {
+    public static Pair<Long, Double> GetSubIndexValue_NO2(double inputRawValue,String FwVersion) {
         double subIndexValue_double = 0;
         long subIndexValue = 0;
         double sensitivity = 0.01648; // 16.48 nA/ppm,  0.01648 nA/ppb;
+
+        if(FwVersion.equals("AirifyW4"))
+            sensitivity = 0.01648;
+        else
+            sensitivity = 0.01739;
 
         double measuredVoltage = GetVoltageFromQuanta(inputRawValue); // => V
 
@@ -117,10 +127,15 @@ public class AqiUtils {
      Very Unhealthy(201 - 300)    <=>  305 - 604
      Hazardous( 301 - 500 )       <=>  605 - 1004
     */
-    public static Pair<Long, Double> GetSubIndexValue_SO2(double inputRawValue) {
+    public static Pair<Long, Double> GetSubIndexValue_SO2(double inputRawValue,String FwVersion) {
         double subIndexValue_double = 0;
         long subIndexValue = 0;
         double sensitivity = 0.03722; // 16.48 nA/ppm,  0.01648 nA/ppb;
+
+        if(FwVersion.equals("AirifyW4"))
+            sensitivity = 0.03722;
+        else
+            sensitivity = 0.03777;
 
         double measuredVoltage = GetVoltageFromQuanta(inputRawValue); // => V
 
@@ -157,10 +172,14 @@ public class AqiUtils {
      Very Unhealthy(201 - 300)    <=>  106 - 200
      Hazardous( 301 - 500 )       <=>  201 - 404
     */
-    public static Pair<Long, Double> GetSubIndexValue_O3(double inputRawValue) {
+    public static Pair<Long, Double> GetSubIndexValue_O3(double inputRawValue,String FwVersion) {
         double subIndexValue_double = 0;
         long subIndexValue = 0;
-        double sensitivity = 0.06773; // 16.48 nA/ppm,  0.01648 nA/ppb;
+        double sensitivity; // 16.48 nA/ppm,  0.01648 nA/ppb;
+        if(FwVersion.equals("AirifyW4"))
+            sensitivity = 0.06773;
+        else
+            sensitivity = 0.0589;
 
         double measuredVoltage = GetVoltageFromQuanta(inputRawValue); // => V
 

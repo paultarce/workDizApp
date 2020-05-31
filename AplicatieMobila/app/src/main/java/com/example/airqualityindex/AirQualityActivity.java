@@ -882,19 +882,19 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     private void PushValueAndGetAQI(String[] data)
     {
         long subIndexValue = 0;
-        Pair<Long, Double> subIndexAndConcentration_CO = AqiUtils.GetSubIndexValue_CO(Double.parseDouble(data[1]));
+        Pair<Long, Double> subIndexAndConcentration_CO = AqiUtils.GetSubIndexValue_CO(Double.parseDouble(data[1]),bluetoothDevice.getName());
         gauge_CO.speedTo(subIndexAndConcentration_CO.first);
         gauge_CO.setUnit(subIndexAndConcentration_CO.second +"ppm");
 
-        Pair<Long, Double> subIndexAndConcentration_NO2 = AqiUtils.GetSubIndexValue_NO2(Double.parseDouble(data[2]));
+        Pair<Long, Double> subIndexAndConcentration_NO2 = AqiUtils.GetSubIndexValue_NO2(Double.parseDouble(data[2]), bluetoothDevice.getName());
         gauge_NO2.speedTo(subIndexAndConcentration_NO2.first);
         gauge_NO2.setUnit(subIndexAndConcentration_NO2.second + "ppb");
 
-        Pair<Long, Double> subIndexAndConcentration_SO2 = AqiUtils.GetSubIndexValue_SO2(Double.parseDouble(data[3]));
+        Pair<Long, Double> subIndexAndConcentration_SO2 = AqiUtils.GetSubIndexValue_SO2(Double.parseDouble(data[3]), bluetoothDevice.getName());
         gauge_SO2.speedTo(subIndexAndConcentration_SO2.first);
         gauge_SO2.setUnit(subIndexAndConcentration_SO2.second + "ppb");
 
-        Pair<Long, Double> subIndexAndConcentration_O3 = AqiUtils.GetSubIndexValue_O3(Double.parseDouble(data[4]));
+        Pair<Long, Double> subIndexAndConcentration_O3 = AqiUtils.GetSubIndexValue_O3(Double.parseDouble(data[4]), bluetoothDevice.getName());
         gauge_O3.speedTo(subIndexAndConcentration_O3.first);
         gauge_O3.setUnit(subIndexAndConcentration_O3.second + "ppb");
 
