@@ -1,0 +1,37 @@
+- O3 - noapte vs Ziua 
+
+
+- calcula media - eroarea patratica medie  - pe valori raw , compar fiecare senzor de pe fiecare dispozitiv 
+		- senzor mai bun daca are eroare p.m mai mica - sa pun intr-un tabel comparativ pentru W5 si W4
+		- varianta - le iau pe blocuri de 1h - sa nu am variatii mari 
+		- 
+- sa ma astept sa nu apara diferente la unii poluanti - NO2
+
+
+- O parte studiu : comparatie valori senzori in circumstante asemantoare - calcul abatere 
+- A doua: 	- Observatie variatii intre calupuri de circumstante asemnaatoare 
+
+
+
+
+
+- Senzorii nu au o acuratete foarte buna, dar e bine ca am vazut schimbari, nu ne putem baza pe toate variatile alea 
+- sa dau niste parametrii de varianta si eroare patratica medie : calculez media, eroarea patratica medie + varianta
+		- pe valorile raw - compar pe fiecare snezor de la feicare dispozitiv, sa vedem care e mai bun
+		- Senzor mai bun daca are varianta is eroare medie mai mica
+		- pun valorile in tabel pentru fiecare senzor
+		
+- fac erori si variante la fiecare senzor pe fiecare experiment : apoi inca o data media la senzori pe toate experimentele
+- BME au o latenta mai mare   - folosit pe low power , si acolo actualiz
+- Senzorul face niste corecctii pentru temperatura (Compensatii) 
+- Calibrare - datele au relevanta ca si variatie  ,nu ca si valori absotulte - nu avema cum sa le calibram noi
+
+TO DO 
+
+	- O3 -- caut date de ziua  vs  date de noaptea 
+	
+	- citeste profu ,imi zice ce am de extras pentru articol si apoi pregatim prezentarea 
+	- nu mai aplic filtru trece-jos  - 
+	
+	- calculez parametrii pe portiuni mai mici : varianta si eroarea patratica o iau pe blocuri de 1h
+	- Inregistrat video cu MobileZen
