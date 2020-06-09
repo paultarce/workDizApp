@@ -534,7 +534,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                             btnShowCharts.setEnabled(true);
                         }
                         else
-                            Toast.makeText(getApplicationContext(),"SPEC Database is Null!", Toast.LENGTH_SHORT);
+                            Toast.makeText(getApplicationContext(),"SPEC Database is Null!", Toast.LENGTH_SHORT).show();
 
                         if(measurementsDBspec.size() == 0)
                             txtNrMeasurements.setText("DB Size:" + 0);
@@ -558,7 +558,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
                             //btnShowCharts.setEnabled(true);
                         }
                         else
-                            Toast.makeText(getApplicationContext(),"BME Database is Null!", Toast.LENGTH_SHORT);
+                            Toast.makeText(getApplicationContext(),"BME Database is Null!", Toast.LENGTH_SHORT).show();
                     }
 
                     @Override
@@ -624,6 +624,7 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
             @Override
             public void onClick(View v) {
                 saveToDbRate = Integer.parseInt(txtInputSaveDataRate.getEditText().getText().toString());
+                Toast.makeText(getApplicationContext(),"Rate set to " + saveToDbRate +" s", Toast.LENGTH_SHORT).show();
             }
         });
 
