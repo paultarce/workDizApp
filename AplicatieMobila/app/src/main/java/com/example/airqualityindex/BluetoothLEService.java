@@ -189,37 +189,33 @@ public class BluetoothLEService extends Service {
             //int sensorIndex = characteristic.getIntValue(format, 0);
             //String stringValue = characteristic.getStringValue(2);
 
-            byte[] receivedBytes = characteristic.getValue();
-            String inputString = new String(Arrays.copyOfRange(receivedBytes, 1, 5), Charset.forName("US-ASCII"));
+            byte[] chVal = characteristic.getValue();
             String[] sensorValues = new String[5];
-            if(receivedBytes.length == 17) // get SPEC sensor values - in ppb
+            if(chVal.length == 17) // get SPEC sensor values - in ppb
             {
-                int CO_Value = AqiUtils.GetIntFromByteArray(new byte[]{receivedBytes[1], receivedBytes[2], receivedBytes[3], receivedBytes[4]});
-                int NO2_Value = AqiUtils.GetIntFromByteArray(new byte[]{receivedBytes[5], receivedBytes[6], receivedBytes[7], receivedBytes[8]});
-                int SO2_Value = AqiUtils.GetIntFromByteArray(new byte[]{receivedBytes[9], receivedBytes[10], receivedBytes[11], receivedBytes[12]});
-                int O3_Value = AqiUtils.GetIntFromByteArray(new byte[]{receivedBytes[13], receivedBytes[14], receivedBytes[15], receivedBytes[16]});
-                //AqiUtils.GetIntFromByteArray(Arrays.copyOfRange(receivedBytes, 5, 8));
+                int CO_Value = AqiUtils.GetIntFromByteArray(new byte[]{chVal[1], chVal[2], chVal[3], chVal[4]});
+                int NO2_Value = AqiUtils.GetIntFromByteArray(new byte[]{chVal[5], chVal[6], chVal[7], chVal[8]});
+                int SO2_Value = AqiUtils.GetIntFromByteArray(new byte[]{chVal[9], chVal[10], chVal[11], chVal[12]});
+                int O3_Value = AqiUtils.GetIntFromByteArray(new byte[]{chVal[13], chVal[14], chVal[15], chVal[16]});
                 sensorValues[0] = "SensorValues";
                 sensorValues[1] =  String.valueOf(CO_Value);
                 sensorValues[2] =  String.valueOf(NO2_Value);
                 sensorValues[3] =  String.valueOf(SO2_Value);
                 sensorValues[4] =  String.valueOf(O3_Value);
-
-                //final int battery_level = characteristic.getIntValue(format, 0);
-                intent.putExtra(EXTRA_DATA, sensorValues); // pot sa creez si alt string precum EXTRA_DATA ca sa trimit caracteristici dupa nume/UUID
+                intent.putExtra(EXTRA_DATA, sensorValues);
                 sendBroadcast(intent);
             }
         }
         if(UUID_BME_DATA.equals(characteristic.getUuid())) {
             // 1- 2 ,  3 - 2,  5 - 4
-            byte[] receivedBytes = characteristic.getValue();
+            byte[] chVal = characteristic.getValue();
             String[] sensorValues = new String[4];
-           // if (receivedBytes.length == 18) // get SPEC sensor values - in ppb
+           // if (chVal.length == 18) // get SPEC sensor values - in ppb
 
-            int TEMP_Value = AqiUtils.GetIntFromByteArray(new byte[]{0,0,receivedBytes[1],receivedBytes[2]});
-            int HUMID_Value = AqiUtils.GetIntFromByteArray(new byte[]{0,0, receivedBytes[3], receivedBytes[4]});
-            int PRESSURE_Value = AqiUtils.GetIntFromByteArray(new byte[]{receivedBytes[5], receivedBytes[6], receivedBytes[7], receivedBytes[8]});
-            //AqiUtils.GetIntFromByteArray(Arrays.copyOfRange(receivedBytes, 5, 8));
+            int TEMP_Value = AqiUtils.GetIntFromByteArray(new byte[]{0,0,chVal[1],chVal[2]});
+            int HUMID_Value = AqiUtils.GetIntFromByteArray(new byte[]{0,0, chVal[3], chVal[4]});
+            int PRESSURE_Value = AqiUtils.GetIntFromByteArray(new byte[]{chVal[5], chVal[6], chVal[7], chVal[8]});
+            //AqiUtils.GetIntFromByteArray(Arrays.copyOfRange(chVal, 5, 8));
             sensorValues[0] = "SensorValuesBME";
             sensorValues[1] = String.valueOf(TEMP_Value);
             sensorValues[2] = String.valueOf(HUMID_Value);
@@ -235,12 +231,9 @@ public class BluetoothLEService extends Service {
         }
         if (UUID_Battery_LEVEL.equals(characteristic.getUuid())) {
             int format = BluetoothGattCharacteristic.FORMAT_UINT8;
-            //int value = characteristic.getValue()[2];
             final int battery_level = characteristic.getIntValue(format, 0);
-
             valueToSend_Battery[0] = "BATTERY";
             valueToSend_Battery[1] = String.valueOf(battery_level);
-
             intent.putExtra(EXTRA_DATA, valueToSend_Battery);
             sendBroadcast(intent);
         }

@@ -1065,7 +1065,10 @@ public class AirQualityActivity extends AppCompatActivity { //sau  AppCompatActi
     public void InitializeGauges()
     {
         List<Section> sectionsAQI = new ArrayList<Section>();
-        Section s1 = new Section(0f,.1f, Color.rgb(34, 139, 34)); s1.setStyle(Section.Style.SQUARE); sectionsAQI.add(s1);
+        Section s1 = new Section(0f,.1f, Color.rgb(34, 139, 34));
+        s1.setStyle(Section.Style.SQUARE);
+        sectionsAQI.add(s1);
+        //the other 4 sections
         Section s2 = new Section(.1f, .2f, Color.rgb(255,222,0)); s2.setStyle(Section.Style.SQUARE); sectionsAQI.add(s2);
         Section s3 = new Section(.2f,.3f, Color.rgb(255,165, 0)); s3.setStyle(Section.Style.SQUARE); sectionsAQI.add(s3);
         Section s4 = new Section(.3f, .4f, Color.RED); s4.setStyle(Section.Style.SQUARE);  sectionsAQI.add(s4);
